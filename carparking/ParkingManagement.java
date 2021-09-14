@@ -10,7 +10,6 @@ public class ParkingManagement {
     private List<Integer>reservedCars=new ArrayList<>();
 
     public List<SlotSpace> getReservedSpace() {
-        System.out.println(reservedSpace);
         return reservedSpace;
     }
 
@@ -34,7 +33,6 @@ public class ParkingManagement {
     }
 
     public List <SlotSpace> getAvailableSpace() {
-        System.out.println(availableSpaces.toString());
         return availableSpaces;
     }
 

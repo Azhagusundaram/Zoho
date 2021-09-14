@@ -10,7 +10,9 @@ public class InputLayer {
         int numOfFloor=scan.nextInt();
         System.out.println("Number of slots in each floor : ");
         int numOfSlots=scan.nextInt();
-        driver.addSlots(numOfFloor,numOfSlots);
+        System.out.println("Number of reserved Slots : ");
+        int numOfReservedSlots=scan.nextInt();
+        driver.addSlots(numOfFloor,numOfSlots,numOfReservedSlots);
         driver.setReservedCars();
         while (true){
             System.out.println("Choose the number");
@@ -69,7 +71,7 @@ public class InputLayer {
         String[]hourSplit=session[0].split(":");
         int minutes=Integer.parseInt(hourSplit[0])*60;
         minutes+=Integer.parseInt(hourSplit[1]);
-        if(session[1].startsWith("P")||session[1].startsWith("p")){
+        if((session[1].startsWith("P")||session[1].startsWith("p")) && !hourSplit[0].equals("12")){
             minutes+=720;
         }
         return minutes;

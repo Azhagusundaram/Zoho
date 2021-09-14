@@ -5,13 +5,13 @@ import java.util.*;
 public class ProgramDriver {
     ParkingManagement cache=new ParkingManagement();
     DailyManagement day=new DailyManagement();
-    public void addSlots(int numOfFloors,int numOfSlots){
+    public void addSlots(int numOfFloors,int numOfSlots,int numOfReservedSlots){
         List<SlotSpace> temporarySlots=new ArrayList<>();
         List<SlotSpace>reservedSlots=new ArrayList<>();
         for(int i=1;i<=numOfFloors;i++){
             for(int j=1;j<=numOfSlots;j++){
                 SlotSpace slotSpace = getSlotSpace(i, j);
-                if(j<=2){
+                if(j<=numOfReservedSlots){
                     slotSpace.setReserved(true);
                     reservedSlots.add(slotSpace);
                     continue;
@@ -38,12 +38,16 @@ public class ProgramDriver {
     public String findParkingSpace(Car car){
         boolean reserved=car.getReserved();
         int time=car.getEntryTime();
+        int carNumber=car.getCarNumber();
         List<SlotSpace>availableSpaces= cache.getAvailableSpace();
         List<SlotSpace>reservedSpaces=cache.getReservedSpace();
         if(!availableSpaces.isEmpty()||!reservedSpaces.isEmpty()){
             String result="";
             if(time<540){
                 if(reserved==true){
+                    if(!checkReserved(carNumber)){
+                        return "Your Car is Not Reserved";
+                    }
                     SlotSpace slotSpace=reservedSpaces.get(0);
                     result=bookSlot(car, slotSpace);
                     reservedSpaces.remove(0);
@@ -71,7 +75,6 @@ public class ProgramDriver {
         return "Slot Not Available";
     }
     public int getAvailableSpaces(int time){
-        System.out.println(time);
         int number=0;
         if(time<540){
             number=cache.getAvailableSpace().size();
@@ -82,7 +85,6 @@ public class ProgramDriver {
         return number;
     }
     public String getFare(int carNumber,int exitTime){
-        String result="";
         Map<Integer,Car> cars=cache.getParkedSpace();
         if(checkCarNumber(carNumber)){
            Car car=cache.getParkedSpace().get(carNumber);
@@ -108,8 +110,8 @@ public class ProgramDriver {
 
     private int getTotalTime(int exitTime, int entryTime) {
         int totalTime=Math.abs(exitTime - entryTime);
-        totalTime=totalTime/60;
         int reminder=totalTime%60;
+        totalTime=totalTime/60;
         if(reminder!=0){
             totalTime+=1;
         }
