@@ -5,7 +5,8 @@ import java.util.*;
 public class ProgramDriver {
     ParkingManagement cache=new ParkingManagement();
     DailyManagement day=new DailyManagement();
-    public void addSlots(int numOfFloors,int numOfSlots,int numOfReservedSlots){
+    int numOfReservedSlots=2;
+    public void addSlots(int numOfFloors,int numOfSlots){
         List<SlotSpace> temporarySlots=new ArrayList<>();
         List<SlotSpace>reservedSlots=new ArrayList<>();
         for(int i=1;i<=numOfFloors;i++){
@@ -87,23 +88,23 @@ public class ProgramDriver {
     public String getFare(int carNumber,int exitTime){
         Map<Integer,Car> cars=cache.getParkedSpace();
         if(checkCarNumber(carNumber)){
-           Car car=cache.getParkedSpace().get(carNumber);
-           int entryTime=car.getEntryTime();
-           int totalTime = getTotalTime(exitTime, entryTime);
-           int amount=totalTime*50;
-           car.setAmount(amount);
-           car.setExitTime(exitTime);
-           day.setTotalFare(amount);
-           day.setCars(car);
-           cars.remove(carNumber);
-           int slotNumber=car.getSlotNumber();
-           int floorNumber=car.getFloorNumber();
-           SlotSpace slotSpace=getSlotSpace(floorNumber,slotNumber);
-           if(slotNumber<=2){
-               cache.setReservedSpace(slotSpace);
-           }
+            Car car=cache.getParkedSpace().get(carNumber);
+            int entryTime=car.getEntryTime();
+            int totalTime = getTotalTime(exitTime, entryTime);
+            int amount=totalTime*50;
+            car.setAmount(amount);
+            car.setExitTime(exitTime);
+            day.setTotalFare(amount);
+            day.setCars(car);
+            cars.remove(carNumber);
+            int slotNumber=car.getSlotNumber();
+            int floorNumber=car.getFloorNumber();
+            SlotSpace slotSpace=getSlotSpace(floorNumber,slotNumber);
+            if(slotNumber<=numOfReservedSlots){
+                cache.setReservedSpace(slotSpace);
+            }
             cache.setAvailableSpace(slotSpace);
-           return "Total Fare : "+amount;
+            return "Total Fare : "+amount;
         }
         return "Invalid Car Number";
     }

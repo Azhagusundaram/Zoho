@@ -10,9 +10,7 @@ public class InputLayer {
         int numOfFloor=scan.nextInt();
         System.out.println("Number of slots in each floor : ");
         int numOfSlots=scan.nextInt();
-        System.out.println("Number of reserved Slots : ");
-        int numOfReservedSlots=scan.nextInt();
-        driver.addSlots(numOfFloor,numOfSlots,numOfReservedSlots);
+        driver.addSlots(numOfFloor,numOfSlots);
         driver.setReservedCars();
         while (true){
             System.out.println("Choose the number");

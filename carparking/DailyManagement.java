@@ -5,7 +5,6 @@ import java.util.List;
 
 public class DailyManagement {
     private int totalFare=0;
-    private int numberOfCarsParked;
     private List<Car>cars=new ArrayList<>();
 
     public int getTotalFare() {
