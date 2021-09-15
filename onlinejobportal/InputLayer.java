@@ -228,21 +228,12 @@ public class InputLayer {
     }
 
     private static String checkPassword(Scanner scan, String password) {
-//        while(!Pattern.matches("(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$&\\*\\.><]).{8,15}", password)) {
-//            System.out.println("Password must contains 8 to 15 Character.Password must have one uppercase letter,one lowercase letter and numbers.\nEnter the Password");
-//            password=scan.nextLine();
-//        }
-//        return password;
         while (!Pattern.matches("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#$%&]).{8,15}", password)){
             System.out.println("Enter correct password :");
             password = scan.nextLine();
         }
         return password;
     }
-//    public static String setPassword(String name,String mail) {
-//        String password="";
-//
-//    }
     private static String getName(String name){
         String[]array=name.split("\\.");
         return array[1];
