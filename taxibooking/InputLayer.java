@@ -31,6 +31,11 @@ public class InputLayer {
             }else if(decision==2){
                 Map<Taxi, List<Customer>>result= driver.getAllDetails();
                 System.out.println(result);
+            }else if(decision==3){
+                break;
+            }
+            else {
+                System.out.println("Invalid Input");
             }
         }
     }
