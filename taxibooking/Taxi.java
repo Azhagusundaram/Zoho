@@ -30,7 +30,10 @@ public class Taxi {
     }
 
     public void setTime(int time) {
-        this.time = time;
+        this.time+= time;
+        if(time>24){
+            this.time-=24;
+        }
     }
 
     public int getTotalAmount() {
@@ -38,6 +41,10 @@ public class Taxi {
     }
 
     public void setTotalAmount(int totalAmount) {
-        this.totalAmount = totalAmount;
+        this.totalAmount+= totalAmount;
+    }
+    @Override
+    public String toString(){
+        return "Taxi Number : "+taxiNumber+"\t Total Earnings : "+totalAmount;
     }
 }

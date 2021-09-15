@@ -1,11 +1,8 @@
 package taxibooking;
 
 public class Customer {
+    private int bookingId;
     private int customerId;
-    private int pickupTime;
-    private char pickUpPlace;
-    private char dropPlace;
-    private int amount;
 
     public int getCustomerId() {
         return customerId;
@@ -13,6 +10,29 @@ public class Customer {
 
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+
+    private int pickupTime;
+    private char pickUpPlace;
+    private char dropPlace;
+    private int amount;
+
+    public int getDropTime() {
+        return dropTime;
+    }
+
+    public void setDropTime(int dropTime) {
+        this.dropTime = pickupTime+dropTime;
+    }
+
+    private int dropTime;
+
+    public int getBookingId() {
+        return bookingId;
+    }
+
+    public void setBookingId(int bookingId) {
+        this.bookingId = bookingId;
     }
 
     public int getPickupTime() {
@@ -45,5 +65,9 @@ public class Customer {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+    @Override
+    public String toString(){
+        return bookingId +" "+pickUpPlace+" "+dropPlace+" "+pickupTime+" "+dropTime+" "+amount;
     }
 }
