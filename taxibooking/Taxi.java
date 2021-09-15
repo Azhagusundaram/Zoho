@@ -30,8 +30,11 @@ public class Taxi {
     }
 
     public void setTime(int time) {
+        this.time= time;
+    }
+    public void addTime(int time){
         this.time+= time;
-        if(time>24){
+        if(time>=24){
             this.time-=24;
         }
     }

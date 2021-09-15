@@ -12,7 +12,7 @@ public class ProgramDriver {
             char position=customer.getDropPlace();
             taxi.setPosition(position);
             int totalTime=getTime(customer);
-            taxi.setTime(totalTime);
+            taxi.addTime(totalTime);
             customer.setDropTime(totalTime);
             int amount=getAmount(totalTime);
             taxi.setTotalAmount(amount);
@@ -21,6 +21,7 @@ public class ProgramDriver {
             bookingId++;
             cache.setAllBookingDetails(taxi,customer);
             cache.setAllTaxis(taxi);
+
             return "Booking Id is "+bookingId+"\nTaxi-"+taxi.getTaxiNumber()+" is allotted";
         }
         return "No Taxi Available";
@@ -39,9 +40,9 @@ public class ProgramDriver {
                 List<Taxi>taxis= allTaxis.get(pickUpPlace);
                 if(taxis!=null&&!taxis.isEmpty()){
                     Taxi taxi=taxis.get(0);
-                    taxis.remove(taxi);
-                    if(taxi.getTime()< pickUpTime){
+                    if(taxi.getTime()<=pickUpTime){
                         taxi.setTime(pickUpTime);
+                        taxis.remove(taxi);
                         return taxi;
                     }
                 }
