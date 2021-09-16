@@ -4,6 +4,17 @@ import java.util.*;
 
 public class ProgramDriver {
     OrderManagement cache=new OrderManagement();
+
+    public void initialSetUp(List<Hotel>hotels){
+        for(Hotel hotel:hotels){
+            Map<String,Food>foods= hotel.getFoods();
+            Set<String>foodNames=foods.keySet();
+            for(String foodName:foodNames){
+                cache.setFoods(foodName,hotel);
+            }
+            cache.setHotels(hotel);
+        }
+    }
     public String addAccount(Customer customer){
         Map<String,Customer> customerDetails=cache.getCustomerDetails();
         String emailId=customer.getEmailId();
@@ -60,7 +71,7 @@ public class ProgramDriver {
     }
     public List<String> searchHotelInFood(String foodName){
         Map<String,Hotel>hotelMap=cache.getFoods().get(foodName);
-       Set<String>hotels= hotelMap.keySet();
+        Set<String>hotels= hotelMap.keySet();
         List<String>hotelsList=new ArrayList<>();
         int i=1;
         for(String hotel:hotels){
@@ -72,13 +83,13 @@ public class ProgramDriver {
     public int orderFood(List<String>foodNames,String hotelName){
         int totalAmount=0;
         Hotel hotel=cache.getHotels().get(hotelName);
-         Map<String,Food>foodMap= hotel.getFoods();
-         for (String foodName:foodNames){
-             Food food=foodMap.get(foodName);
-             int price=food.getPrice();
-             totalAmount+=price;
-         }
-         return totalAmount;
+        Map<String,Food>foodMap= hotel.getFoods();
+        for (String foodName:foodNames){
+            Food food=foodMap.get(foodName);
+            int price=food.getPrice();
+            totalAmount+=price;
+        }
+        return totalAmount;
     }
     public String confirmOrder(String hotelName, String customerEmailId, int totalAmount, List<String>foods){
         Hotel hotel=cache.getHotels().get(hotelName);
