@@ -40,11 +40,11 @@ public class Functionalities {
         return count;
     }
     public void begin(){
-        finalMap = tempMap;
-        tempMap =new HashMap<>();
+        finalMap.putAll(tempMap);
+        tempMap.clear();
     }
     public void rollBack(){
-        tempMap=new HashMap<>();
+        tempMap.clear();
         tempMap.putAll(finalMap);
     }
     public void commit(){
