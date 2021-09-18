@@ -7,7 +7,7 @@ public class Passenger {
     private String ticketType;
     private String meal;
     private double amount;
-    
+
     public void setName(String name) {
         this.name = name;
     }

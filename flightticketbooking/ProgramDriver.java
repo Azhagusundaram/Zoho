@@ -78,14 +78,9 @@ public class ProgramDriver {
         int numOfFlights=2;
         int economyTickets=20;
         int businessTickets=10;
-        double surgePrice=0.2;
-        double economyTicketPrice=100;
-        double businessTicketPrice=200;
-        int mealPrice=50;
+
         for(int i=1;i<=numOfFlights;i++){
-            Flight flight=new Flight();
             int flightNumber=100+i;
-            flight.setFlightNumber(flightNumber);
             List<Integer>businessTicketSeats=new ArrayList<>(businessTickets);
             List<Integer>economyTicketSeats=new ArrayList<>(economyTickets);
             for(int j=1;j<=economyTickets;j++){
@@ -94,17 +89,29 @@ public class ProgramDriver {
             for (int k=1;k<=businessTickets;k++){
                 businessTicketSeats.add(economyTickets+k);
             }
-            flight.setFlightNumber(flightNumber);
-            flight.setBusinessTicketPrice(businessTicketPrice);
-            flight.setEconomyTicketPrice(economyTicketPrice);
-            flight.setBusinessTickets(businessTicketSeats);
-            flight.setEconomyTickets(economyTicketSeats);
-            flight.setSurgePrice(surgePrice);
-            flight.setMealPrice(mealPrice);
+            Flight flight = getFlight(flightNumber, businessTicketSeats, economyTicketSeats);
             cache.setFlights(flight);
             cache.setAvailableTickets(flight);
         }
     }
+
+    private Flight getFlight(int flightNumber, List<Integer> businessTicketSeats, List<Integer> economyTicketSeats) {
+        double surgePrice=0.2;
+        double economyTicketPrice=100;
+        double businessTicketPrice=200;
+        int mealPrice=50;
+        Flight flight=new Flight();
+        flight.setFlightNumber(flightNumber);
+        flight.setFlightNumber(flightNumber);
+        flight.setBusinessTicketPrice(businessTicketPrice);
+        flight.setEconomyTicketPrice(economyTicketPrice);
+        flight.setBusinessTickets(businessTicketSeats);
+        flight.setEconomyTickets(economyTicketSeats);
+        flight.setSurgePrice(surgePrice);
+        flight.setMealPrice(mealPrice);
+        return flight;
+    }
+
     public Map<Integer, Map<String, Integer>> getAvailableTickets(){
         Map<Integer,Map<String,Integer>>availableSeats=new HashMap<>();
         Map<Integer, Map<String, List<Integer>>>availableTickets=cache.getAvailableTickets();
