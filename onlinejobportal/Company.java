@@ -12,9 +12,9 @@ public class Company {
     private String name;
     private String password;
     private String address;
-    private Map<String, Job> vacancyJobs=new HashMap<>();
-    private Map<String,List<String>>appliedList=new HashMap<>();
-    private Map<String,List<Job>>selectedList=new HashMap<>();
+    private List<Integer>vacancyJob=new ArrayList<>();
+    private Map<Integer,List<Integer>>appliedList=new HashMap<>();
+    private Map<Integer,List<Integer>>selectedList=new HashMap<>();
 
     public int getCompanyId() {
         return companyId;
@@ -23,36 +23,44 @@ public class Company {
     public void setCompanyId(int companyId) {
         this.companyId = companyId;
     }
-    public void setSelectedList(String applicantName,Job job){
-        List<Job>jobs=selectedList.get(applicantName);
+    public boolean setSelectedList(int applicantId, int jobId){
+        List<Integer>jobs=selectedList.get(applicantId);
         if(jobs==null){
             jobs=new ArrayList<>();
-            selectedList.put(applicantName,jobs);
+            selectedList.put(applicantId,jobs);
         }
-        jobs.remove(job);
-        jobs.add(job);
+        jobs.add(jobId);
+        return true;
     }
-    public Map<String, List<Job>> getSelectedList(){
+    public Map<Integer, List<Integer>> getSelectedList(){
         return selectedList;
     }
-    public void addVacancyJobs(String jobName,Job job){
-        vacancyJobs.put(jobName,job);
+    public void addVacancyJob(int jobId){
+        vacancyJob.add(jobId);
     }
-    public void addApplicantList(String applicantName,String jobName){
-        List<String>jobs=appliedList.get(applicantName);
+    public List<Integer> getVacancyJob(){
+        return vacancyJob;
+    }
+    public boolean addApplicantList(int applicantId, int jobId){
+        List<Integer>jobs=appliedList.get(applicantId);
         if(jobs==null){
             jobs=new ArrayList<>();
-            appliedList.put(applicantName,jobs);
+            appliedList.put(applicantId,jobs);
         }
-        jobs.remove(jobName);
-        jobs.add(jobName);
+        jobs.add(jobId);
+        return true;
     }
-    public Map<String, List<String>> getAppliedList(){
+    public void removeApplicantList(int applicantId,int jobId){
+        List<Integer>jobs=appliedList.get(applicantId);
+        jobs.remove(jobId);
+        if(jobs.isEmpty()){
+            appliedList.remove(applicantId);
+        }
+    }
+    public Map<Integer, List<Integer>> getAppliedList(){
         return appliedList;
     }
-    public Job getJobDetails(String jobName){
-        return vacancyJobs.get(jobName);
-    }
+
     public String getName() {
         return name;
     }
@@ -75,5 +83,8 @@ public class Company {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+    public String getCompanyDetails(){
+        return "Company Name :"+name+"\nCompany Id :"+companyId+" Location :"+address;
     }
 }

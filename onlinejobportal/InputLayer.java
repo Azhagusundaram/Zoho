@@ -16,33 +16,43 @@ public class InputLayer {
             if(decision==1){
 
                 while (true){
-
                     System.out.println("1.New Applicant\n2.Existing Applicant\n3.Exit");
                     int decision1=scan.nextInt();
                     scan.nextLine();
                     if(decision1==1){
                         Applicant applicant = getApplicant(scan);
                         int result= applicantDriver.addApplicant(applicant);
-                        System.out.println("Applicant Number is "+result);
+                        System.out.println("Applicant Id is "+result);
                     }else if(decision1==2){
-                        System.out.println("Name");
-                        String name=scan.nextLine();
+                        System.out.println("Applicant Id");
+                        int applicantId=scan.nextInt();
+                        scan.nextLine();
                         System.out.println("Password");
                         String password=scan.nextLine();
-                        if(applicantDriver.checkCredentials(name,password)){
+                        if(applicantDriver.checkCredentials(applicantId,password)){
                             while (true){
                                 System.out.println("1.View and apply Jobs\n2.view Applied Jobs\n3.view Selected Jobs\n4.Exit");
                                 int decision2=scan.nextInt();
                                 scan.nextLine();
                                 if(decision2==1){
-                                    viewAndApplyJobs(scan, applicantDriver, name);
+                                    viewAndApplyJobs(scan, applicantDriver, applicantId);
                                 }else if(decision2==2){
-                                    Map<String, List<Job>>appliedJobs= applicantDriver.getAppliedJobs(name);
-                                    System.out.println(appliedJobs.toString());
-                                }else if(decision2==3){
-                                    Map<String, List<Job>>selectedJobs=applicantDriver.getSelectedJobs(name);
-                                    System.out.println(selectedJobs);
-                                }else if(decision2==4){
+                                    Map<Integer, List<Integer>> appliedJobs= applicantDriver.getAppliedJobs(applicantId);
+                                    if(!appliedJobs.isEmpty()){
+                                        System.out.println(appliedJobs);
+                                    }else {
+                                        System.out.println("You not applied for any jobs yet");
+                                    }
+
+                                }else if(decision2==3) {
+                                    Map<Integer, List<Integer>> selectedJobs = applicantDriver.getSelectedJobs(applicantId);
+                                    if(!selectedJobs.isEmpty()){
+                                        System.out.println(selectedJobs);
+                                    }else {
+                                        System.out.println("You not selected for any jobs yet");
+                                    }
+                                }
+                                else if(decision2==4){
                                     break;
                                 }else {
                                     System.out.println("Invalid Input");
@@ -70,22 +80,28 @@ public class InputLayer {
                         int result=companyDriver.addCompany(company);
                         System.out.println("Company id is "+result);
                     }else if (decision1==2){
-                        System.out.println("Name");
-                        String name=scan.nextLine();
+                        System.out.println("Company Id");
+                        int companyId=scan.nextInt();
+                        scan.nextLine();
                         System.out.println("Password");
                         String password=scan.nextLine();
-                        if(companyDriver.checkCredentials(name,password)){
+                        if(companyDriver.checkCredentials(companyId,password)){
                             while (true){
                                 System.out.println("1.Add Jobs\n2.View and select applicant\n3.view Selected List\n4.Exit");
                                 int decision2=scan.nextInt();
                                 scan.nextLine();
                                 if(decision2==1){
-                                    addJob(scan, companyDriver, name);
+                                    addJob(scan, companyDriver, companyId);
                                 }else if(decision2==2){
-                                    ViewAndSelectApplicant(scan, companyDriver, name);
+                                    ViewAndSelectApplicant(scan, companyDriver, companyId);
                                 }else if(decision2==3){
-                                    Map<String, List<Job>>selectedList=companyDriver.getSelectedApplicants(name);
-                                    System.out.println(selectedList);
+                                    Map<Integer, List<Integer>> selectedList=companyDriver.getSelectedApplicants(companyId);
+                                    if(!selectedList.isEmpty()){
+                                        System.out.println(selectedList);
+                                    }else {
+                                        System.out.println("Not selected any candidates");
+                                    }
+
                                 }else if(decision2==4){
                                     break;
                                 }else {
@@ -112,30 +128,31 @@ public class InputLayer {
 
     }
 
-    private static void ViewAndSelectApplicant(Scanner scan, CompanyProgramDriver companyDriver, String name) {
-        List<String>applicationList= companyDriver.getApplicationList(name);
+    private static void ViewAndSelectApplicant(Scanner scan, CompanyProgramDriver companyDriver, int companyId) {
+        Map<Applicant, List<Job>> applicationList= companyDriver.getApplicationList(companyId);
         System.out.println(applicationList);
-        System.out.println("1.more about application list\n2.exit");
-        int decision3= scan.nextInt();
-        if(decision3==1){
-            System.out.println("Enter application number");
-            int applicationNumber= scan.nextInt();
-            String applicantName=getName(applicationList.get(applicationNumber-1));
-            List<String>jobLists= companyDriver.getJobLists(name,applicantName);
-            System.out.println(jobLists);
-            System.out.println("1.Select Applicant\n2.Exit");
-            int decision4= scan.nextInt();
-            if(decision4==1){
-                System.out.println("Enter the Job Number");
-                int jobNumber= scan.nextInt();
-                String jobName=getName(jobLists.get(jobNumber-1));
-                String result= companyDriver.selectApplicant(applicantName,jobName, name);
-                System.out.println(result);
+        if(!applicationList.isEmpty()){
+            System.out.println("1.Are you select any Candidate\n2.exit");
+            int decision3= scan.nextInt();
+            if(decision3==1){
+                System.out.println("Enter Applicant Id");
+                int applicantId= scan.nextInt();
+                System.out.println("Enter Job Id");
+                int jobId= scan.nextInt();
+                boolean result=companyDriver.selectApplicant(applicantId,jobId,companyId);
+                if(result){
+                    System.out.println("SelectedSuccessfully");
+                }else {
+                    System.out.println("Applicant Id or Job Id is wrong");
+                }
             }
+        }else {
+            System.out.println("No candidates apply");
         }
+
     }
 
-    private static void addJob(Scanner scan, CompanyProgramDriver companyDriver, String name) {
+    private static void addJob(Scanner scan, CompanyProgramDriver companyDriver, int companyId) {
         System.out.println("Enter job Name :");
         String jobName= scan.nextLine();
         System.out.println("Qualification :");
@@ -144,7 +161,7 @@ public class InputLayer {
         int vacancy= scan.nextInt();
         scan.nextLine();
         Job job = getJob(jobName, qualification, vacancy);
-        companyDriver.addJob(job, name);
+        companyDriver.addJob(job, companyId);
     }
 
     private static Company getCompany(Scanner scan) {
@@ -159,29 +176,36 @@ public class InputLayer {
         return company;
     }
 
-    private static void viewAndApplyJobs(Scanner scan, ApplicantProgramDriver applicantDriver, String name) {
-        List<String> allJobs= applicantDriver.getJobs();
-        System.out.println(allJobs);
-        System.out.println("1.detailed about particular jobs\n2.exit");
-        int decision3= scan.nextInt();
-        if(decision3==1){
-            System.out.println("Enter Job Number :");
-            int jobNumber= scan.nextInt();
-            String jobName=getName(allJobs.get(jobNumber-1));
-            List<String>companies= applicantDriver.getCompany(jobName);
-            System.out.println(companies);
-            System.out.println("Enter company Number:");
-            int companyNumber = scan.nextInt();
-            String companyName=getName(companies.get(companyNumber -1));
-            Job job= applicantDriver.getJobDetails(jobName,companyName);
-            System.out.println(job);
-            System.out.println("1.Apply Job\n2.Exit");
-            int decision4= scan.nextInt();
-            if(decision4==1){
-                String result= applicantDriver.applyJob(jobName,companyName, name);
+    private static void viewAndApplyJobs(Scanner scan, ApplicantProgramDriver applicantDriver, int applicantId) {
+        List<Job> allJobs= applicantDriver.getJobs();
+        if(!allJobs.isEmpty()){
+            System.out.println(allJobs);
+            System.out.println("1.View any company Details\n2.exit");
+            int decision3= scan.nextInt();
+            if(decision3==1){
+                System.out.println("company Id");
+                int companyId=scan.nextInt();
+                scan.nextLine();
+                String result=applicantDriver.getCompanyDetails(companyId);
                 System.out.println(result);
             }
+            System.out.println("1.Are you apply Any Job\n2.exit");
+            decision3= scan.nextInt();
+            if(decision3==1){
+                System.out.println("Enter Job Id :");
+                int jobId= scan.nextInt();
+                boolean result=applicantDriver.applyJob(jobId, applicantId);
+                if(result){
+                    System.out.println("Applied Successfully");
+                }else {
+                    System.out.println("Job id is wrong");
+                }
+
+            }
+        }else {
+            System.out.println("Sorry no jobs are available");
         }
+
     }
 
     private static Applicant getApplicant(Scanner scan) {
@@ -234,9 +258,6 @@ public class InputLayer {
         }
         return password;
     }
-    private static String getName(String name){
-        String[]array=name.split("\\.");
-        return array[1];
-    }
+
 
 }

@@ -1,12 +1,9 @@
 package onlinejobportal;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Applicant {
-    private  int applicantNumber;
+    private  int applicantId;
 
 
     private String name;
@@ -14,40 +11,40 @@ public class Applicant {
     private Long mobileNumber;
     private String address;
     private String qualification;
-    private Map<String, List<Job>>appliedJobs=new HashMap<>();
-    private Map<String,List<Job>>selectedJobs=new HashMap<>();
+    private Map<Integer, List<Integer>>appliedJobs=new HashMap<>();
+    private Map<Integer,List<Integer>>selectedJobs=new HashMap<>();
 
-    public int getApplicantNumber() {
-        return applicantNumber;
+    public int getApplicantId() {
+        return applicantId;
     }
 
-    public void setApplicantNumber(int applicantNumber) {
-        this.applicantNumber = applicantNumber;
+    public void setApplicantId(int applicantId) {
+        this.applicantId = applicantId;
     }
 
-    public void addSelectedJobs(String companyName,Job job){
-        List<Job>jobs=selectedJobs.get(companyName);
+    public void addSelectedJobs(int companyId,int jobId){
+        List<Integer>jobs=selectedJobs.get(companyId);
         if(jobs==null){
             jobs=new ArrayList<>();
-            selectedJobs.put(companyName,jobs);
+            selectedJobs.put(companyId,jobs);
         }
-        jobs.remove(job);
-        jobs.add(job);
+        jobs.remove(jobId);
+        jobs.add(jobId);
     }
-    public Map<String, List<Job>> getSelectedJobs(){
+    public Map<Integer, List<Integer>> getSelectedJobs(){
         return selectedJobs;
     }
-    public Map<String, List<Job>> getAppliedJobs(){
+    public Map<Integer, List<Integer>> getAppliedJobs(){
         return appliedJobs;
     }
-    public void applyJob(String companyName,Job job){
-        List<Job>jobs=appliedJobs.get(companyName);
+    public void applyJob(int companyId,int jobId){
+        List<Integer>jobs=appliedJobs.get(companyId);
         if(jobs==null){
             jobs=new ArrayList<>();
-            appliedJobs.put(companyName,jobs);
+            appliedJobs.put(companyId,jobs);
         }
-        jobs.remove(job);
-        jobs.add(job);
+        jobs.remove(jobId);
+        jobs.add(jobId);
     }
 
     public String getName() {
@@ -90,6 +87,8 @@ public class Applicant {
         this.qualification = qualification;
     }
 
-
+    public String toString(){
+        return "Applicant Name :"+name+"\nApplicant Id :"+applicantId+" Location :"+address+" Qualification :"+qualification;
+    }
 
 }

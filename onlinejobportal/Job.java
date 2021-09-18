@@ -1,7 +1,27 @@
 package onlinejobportal;
 
 public class Job {
+    private int jobId;
     private String jobName;
+    private int vacancy;
+    private String eligibilityCriteria;
+    private int companyId;
+
+    public int getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+    }
+
+    public int getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(int jobId) {
+        this.jobId = jobId;
+    }
 
     public String getJobName() {
         return jobName;
@@ -10,9 +30,6 @@ public class Job {
     public void setJobName(String jobName) {
         this.jobName = jobName;
     }
-
-    private int vacancy;
-    private String eligibilityCriteria;
 
     public int getVacancy() {
         return vacancy;
@@ -31,6 +48,6 @@ public class Job {
     }
     @Override
     public String toString(){
-        return jobName+" "+vacancy+" "+eligibilityCriteria;
+        return "JobName : "+jobName+"\tVacancy : "+vacancy+"\t Eligibility Criteria : "+eligibilityCriteria+"\tCompany Id :"+companyId+"\tJob Id : "+jobId;
     }
 }

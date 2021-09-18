@@ -1,70 +1,67 @@
 package onlinejobportal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CompanyProgramDriver {
     JobManagement cache=JobManagement.getInstance();
     int companyId=0;
+    int jobId=1;
     public int addCompany(Company company){
         companyId++;
         company.setCompanyId(companyId);
         cache.addCompanyDetails(company);
         return companyId;
     }
-    public void addJob(Job job,String companyName){
-        Company company=cache.getCompanyDetails().get(companyName);
-        String jobName= job.getJobName();
-        cache.setAllJobs(jobName,companyName);
-        company.addVacancyJobs(jobName,job);
+    public void addJob(Job job,int companyId){
+        job.setJobId(jobId);
+        job.setCompanyId(companyId);
+        Company company=cache.getCompanyDetails().get(companyId);
+        cache.setJobDetails(job);
+        company.addVacancyJob(jobId);
+        jobId++;
     }
-    public List<String> getApplicationList(String companyName){
+    public Map<Applicant, List<Job>> getApplicationList(int  companyId) {
 
-        List<String>applicants=new ArrayList<>();
-        Company company=cache.getCompanyDetails().get(companyName);
-        Set<String>applicants1=company.getAppliedList().keySet();
-        int i=1;
-        for(String applicant:applicants1){
-            applicants.add(i+"."+applicant);
-            i++;
+        Map<Applicant, List<Job>> applicantList = new HashMap<>();
+        Company company = cache.getCompanyDetails().get(companyId);
+        Map<Integer, List<Integer>> applicantLists = company.getAppliedList();
+        Set<Integer> applicantIds = applicantLists.keySet();
+        for (int applicantId : applicantIds) {
+            Applicant applicant = cache.getApplicantDetails().get(applicantId);
+            List<Integer> applyJobIds = applicantLists.get(applicantId);
+            List<Job> applyJobs = new ArrayList<>();
+            for (int applyJobId : applyJobIds) {
+                Job job = cache.getJobDetails().get(applyJobId);
+                applyJobs.add(job);
+            }
+            applicantList.put(applicant, applyJobs);
         }
-        return applicants;
+        return applicantList;
     }
-    public List<String>getJobLists(String companyName,String applicantName){
-        List<String>jobLists=new ArrayList<>();
-        Company company=cache.getCompanyDetails().get(companyName);
-        List<String>jobs=company.getAppliedList().get(applicantName);
-        int i=1;
-        for(String job:jobs){
-            jobLists.add(i+"."+job);
-            i++;
+    public boolean selectApplicant(int  applicantId, int jobId, int companyId){
+        Company company=cache.getCompanyDetails().get(companyId);
+        Map<Integer,Applicant>applicantDetails= cache.getApplicantDetails();
+        Applicant applicant=applicantDetails.get(applicantId);
+        if(applicant!=null&&cache.getJobDetails().containsKey(jobId)){
+            boolean select=company.setSelectedList(applicantId,jobId);
+            company.removeApplicantList(applicantId,jobId);
+            applicant.addSelectedJobs(companyId,jobId);
+            return select;
+        }else {
+            return false;
         }
-        return jobLists;
+
     }
-    public String selectApplicant(String applicantName,String jobName,String companyName){
-        Company company=cache.getCompanyDetails().get(companyName);
-        Map<String,Applicant>applicantDetails= cache.getApplicantDetails();
-        Applicant applicant=applicantDetails.get(applicantName);
-        Job job=company.getJobDetails(jobName);
-        company.setSelectedList(applicantName,job);
-        applicant.addSelectedJobs(companyName,job);
-        return "Applicant Selected";
-    }
-    public Map<String, List<Job>> getSelectedApplicants(String  companyName){
-        Company company=cache.getCompanyDetails().get(companyName);
+    public Map<Integer, List<Integer>> getSelectedApplicants(int  companyId){
+        Company company=cache.getCompanyDetails().get(companyId);
         return company.getSelectedList();
     }
-    public boolean checkCredentials(String name,String password){
-        Company company=cache.getCompanyDetails().get(name);
+    public boolean checkCredentials(int companyId,String password){
+        Company company=cache.getCompanyDetails().get(companyId);
         if(company==null){
             return false;
         }
         String oldPassword=company.getPassword();
-        if(password.equals(oldPassword)){
-            return true;
-        }
-        return false;
+        return password.equals(oldPassword);
     }
 }

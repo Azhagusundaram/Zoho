@@ -7,67 +7,56 @@ import java.util.Set;
 
 public class ApplicantProgramDriver {
     JobManagement cache=JobManagement.getInstance();
-    private int applicantNumber=0;
+    private int applicantId =0;
 
     public int addApplicant(Applicant applicant){
-        applicantNumber++;
-        applicant.setApplicantNumber(applicantNumber);
+        applicantId++;
+        applicant.setApplicantId(applicantId);
         cache.addApplicantDetails(applicant);
-        return applicantNumber;
+        return applicantId;
     }
-    public String applyJob(String jobName, String companyName, String name){
-        Applicant applicant=cache.getApplicantDetails().get(name);
-        Map<String,Company> companyDetails= cache.getCompanyDetails();
-        Company company=companyDetails.get(companyName);
-        company.addApplicantList(name,jobName);
-        Job job=company.getJobDetails(jobName);
-        applicant.applyJob(companyName,job);
-        return "Applied Successfully";
-    }
-    public List<String> getJobs(){
-        List<String>jobNames=new ArrayList<>();
-        Set<String> allJobs=cache.getAllJobs().keySet();
-        int i=1;
-        for(String jobName:allJobs){
-            jobNames.add(i+"."+jobName);
-            i++;
+    public boolean applyJob(int jobId, int applicantId){
+        if(cache.getJobDetails().containsKey(jobId)){
+            Applicant applicant=cache.getApplicantDetails().get(applicantId);
+            Job job=cache.getJobDetails().get(jobId);
+            int companyId=job.getCompanyId();
+            Company company=cache.getCompanyDetails().get(companyId);
+            boolean apply=company.addApplicantList(applicantId,jobId);
+            applicant.applyJob(companyId,jobId);
+            return apply;
+        }else {
+            return false;
         }
-        return jobNames;
+
     }
-    public List<String> getCompany(String jobName){
-        List<String>companyNames=new ArrayList<>();
-        List<String> allJobs=cache.getAllJobs().get(jobName);
-        int i=1;
-        for(String companyName :allJobs){
-            companyNames.add(i+"."+ companyName);
-            i++;
+    public List<Job> getJobs(){
+        List<Job>jobs=new ArrayList<>();
+        Set<Integer> jobIds=cache.getJobDetails().keySet();
+        for(Integer jobId:jobIds){
+            Job job=cache.getJobDetails().get(jobId);
+            jobs.add(job);
         }
-        return companyNames;
+        return jobs ;
     }
-    public Job getJobDetails(String jobName, String companyName){
-        Map<String,Company> companyDetails= cache.getCompanyDetails();
-        Company company=companyDetails.get(companyName);
-        Job job=company.getJobDetails(jobName);
-        return job;
+    public String getCompanyDetails(int companyId){
+        Company company =cache.getCompanyDetails().get(companyId);
+        return company.getCompanyDetails();
     }
-    public Map<String, List<Job>> getSelectedJobs(String name){
-        Applicant applicant=cache.getApplicantDetails().get(name);
+    public Map<Integer, List<Integer>> getSelectedJobs(Integer applicantId){
+        Applicant applicant=cache.getApplicantDetails().get(applicantId);
         return applicant.getSelectedJobs();
     }
-    public boolean checkCredentials(String name,String password){
-        Applicant applicant=cache.getApplicantDetails().get(name);
+    public boolean checkCredentials(int applicantId,String password){
+        Applicant applicant=cache.getApplicantDetails().get(applicantId);
 
         if(applicant==null){
             return false;
         }
         String oldPassword=applicant.getPassword();
-        if(password.equals(oldPassword)){
-            return true;
-        }
-        return false;
+        return password.equals(oldPassword);
     }
-    public Map<String, List<Job>> getAppliedJobs(String name){
-        Applicant applicant=cache.getApplicantDetails().get(name);
+    public Map<Integer, List<Integer>> getAppliedJobs(int applicantId){
+        Applicant applicant=cache.getApplicantDetails().get(applicantId);
         return applicant.getAppliedJobs();
     }
 }
