@@ -1,11 +1,10 @@
 package invoicemanagementsystem;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Invoice {
     private int invoiceNumber;
-    private List<Item> items=new ArrayList<>();
+    private Map<Integer,Integer> items=new HashMap<>();
     private int totalAmount;
 
     public int getInvoiceNumber() {
@@ -16,28 +15,28 @@ public class Invoice {
         this.invoiceNumber = invoiceNumber;
     }
 
-    public void setItems(List<Item> items) {
-        this.items.addAll(items);
+    public void setItems(List<Integer> itemIds) {
+        for(int itemId:itemIds){
+            Integer numOfItem=this.items.get(itemId);
+            if(numOfItem==null){
+                numOfItem=0;
+            }
+            numOfItem=numOfItem+1;
+            this.items.put(itemId,numOfItem);
+
+        }
     }
 
+    public Map<Integer, Integer> getItems() {
+        return items;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
 
     public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;
     }
-    @Override
-    public String toString(){
-        StringBuilder result=new StringBuilder();
-        result.append("\nInvoice Number : ");
-        result.append(invoiceNumber);
-        result.append("\nItem\tPrice");
-        for(Item item:items){
-            result.append("\n"+item.getName()+"\t"+item.getPrice());
-        }
-        result.append("\nTotal Items :");
-        result.append(items.size());
-        result.append("\nTotalPrice : ");
-        result.append(totalAmount);
-        String output=result.toString();
-        return output;
-    }
+
 }

@@ -21,6 +21,7 @@ public class InputLayer {
             Item item=new Item();
             item.setName(itemName);
             item.setPrice(price);
+            item.setItemId(i+1);
             items.add(item);
         }
         driver.addItem(items);
@@ -46,7 +47,7 @@ public class InputLayer {
                 System.out.println("Enter the invoice number :");
                 int invoiceNumber=scan.nextInt();
                 scan.nextLine();
-                List<Item> allItem = chooseItem(scan, driver, items);
+                List<Integer> allItem = chooseItem(scan, driver, items);
                 String result=driver.addItemToInvoice(allItem,invoiceNumber,customerId);
                 System.out.println(result);
             }else if(decision==4){
@@ -78,7 +79,7 @@ public class InputLayer {
         System.out.println("Enter customer id :");
         int customerId= scan.nextInt();
 
-        List<Item> allItem = chooseItem(scan, driver, items);
+        List<Integer> allItem = chooseItem(scan, driver, items);
         int result= driver.addInvoice(allItem,customerId);
         if(result!=0){
             System.out.println("Invoice Number is "+result);
@@ -87,20 +88,19 @@ public class InputLayer {
         }
     }
 
-    private static List<Item> chooseItem(Scanner scan, ProgramDriver driver, List<Item> items) {
+    private static List<Integer> chooseItem(Scanner scan, ProgramDriver driver, List<Item> items) {
         int flag=1;
-        List<Item>allItem=new ArrayList<>();
+        List<Integer>allItem=new ArrayList<>();
         while (flag ==1){
-            System.out.println("Select the Item");
-            StringBuilder allItems= driver.getItems();
+            System.out.println("Select the Item Id");
+            List<Item> allItems= driver.getItems();
             System.out.println(allItems);
-            int itemNum= scan.nextInt();
-            while (itemNum>items.size()||itemNum<=0){
-                System.out.println("Enter Correct Item Number :");
-                itemNum=scan.nextInt();
+            int itemId = scan.nextInt();
+            while (!driver.checkItemId(itemId)){
+                System.out.println("Enter Correct Item Id :");
+                itemId =scan.nextInt();
             }
-            Item item= items.get(itemNum-1);
-            allItem.add(item);
+            allItem.add(itemId);
             System.out.println("1.Continue to add item\n2.Exit");
             flag = scan.nextInt();
         }

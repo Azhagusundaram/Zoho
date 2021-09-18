@@ -1,8 +1,17 @@
 package invoicemanagementsystem;
 
 public class Item {
+    private int itemId;
     private String name;
     private int price;
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
 
     public String getName() {
         return name;
@@ -18,6 +27,9 @@ public class Item {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+    public String toString(){
+        return "Item id : "+itemId+"\t"+name+" - "+price;
     }
 }
 //5

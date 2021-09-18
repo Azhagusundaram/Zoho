@@ -7,7 +7,7 @@ import java.util.Map;
 public class InvoiceManagement {
     private Map<Integer,Customer> customerDetails=new HashMap<>();
     private Map<Integer,Invoice>invoices=new HashMap<>();
-    private Map<String,Integer>items=new LinkedHashMap<>();
+    private Map<Integer,Item>items=new LinkedHashMap<>();
 
     public Map<Integer, Customer> getCustomerDetails() {
         return customerDetails;
@@ -17,7 +17,7 @@ public class InvoiceManagement {
         return invoices;
     }
 
-    public Map<String, Integer> getItems() {
+    public Map<Integer, Item> getItems() {
         return items;
     }
 

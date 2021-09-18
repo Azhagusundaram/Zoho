@@ -1,19 +1,16 @@
 package invoicemanagementsystem;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ProgramDriver {
     int customerId=0;
     int invoiceNumber=0;
     InvoiceManagement cache=new InvoiceManagement();
     public void addItem(List<Item>items){
-        Map<String,Integer>itemMap=cache.getItems();
+        Map<Integer, Item> itemMap=cache.getItems();
         for(Item item:items){
-            String itemName=item.getName();
-            int price= item.getPrice();
-            itemMap.put(itemName,price);
+            int itemId=item.getItemId();
+            itemMap.put(itemId,item);
         }
     }
     public int addCustomer(Customer customer){
@@ -23,16 +20,17 @@ public class ProgramDriver {
         customer.setCustomerId(customerId);
         return customerId;
     }
-    public int addInvoice(List<Item> items,int customerId){
+    public int addInvoice(List<Integer> itemIds,int customerId){
         invoiceNumber++;
+        List<Item>items=getItems(itemIds);
         Map<Integer,Customer>customerDetails= cache.getCustomerDetails();
         if(checkCustomerId(customerId)){
             Customer customer=customerDetails.get(customerId);
             Map<Integer,Invoice>invoices=cache.getInvoices();
             Invoice invoice=new Invoice();
             invoice.setInvoiceNumber(invoiceNumber);
-            invoice.setItems(items);
-            int totalAmount=getAmount(items);
+            invoice.setItems(itemIds);
+            int totalAmount=getAmount(itemIds);
             invoice.setTotalAmount(totalAmount);
             invoices.put(invoiceNumber,invoice);
             customer.setInvoices(invoice);
@@ -40,32 +38,60 @@ public class ProgramDriver {
         }
         return 0;
     }
-    private int calculateAmount(String itemName){
-        Map<String,Integer>items=cache.getItems();
-        int amount=items.get(itemName);
-        return amount;
+    public String getInvoiceDetails(int invoiceNumber){
+        Map<Integer,Item>allItems=cache.getItems();
+        Invoice invoice=cache.getInvoices().get(invoiceNumber);
+        Map<Integer,Integer> items=invoice.getItems();
+        int totalAmount=invoice.getTotalAmount();
+        StringBuilder result=new StringBuilder();
+        result.append("\nInvoice Number : ");
+        result.append(invoiceNumber);
+        result.append("\nItem\tPrice\tNumber of item");
+        Set<Integer> itemIds=items.keySet();
+        for(int itemId:itemIds){
+            Item item=allItems.get(itemId);
+            result.append("\n"+item.getName()+"\t"+item.getPrice()+"\t"+items.get(itemId));
+        }
+        result.append("\nTotal Items :");
+        result.append(items.size());
+        result.append("\nTotalPrice : ");
+        result.append(totalAmount);
+        return result.toString();
+
     }
-    private int getAmount(List<Item>items){
+    private int calculateAmount(int itemId){
+        Map<Integer, Item> items=cache.getItems();
+        Item item=items.get(itemId);
+        return item.getPrice();
+    }
+    private int getAmount(List<Integer>itemIds){
         int totalAmount=0;
 
-        for(Item item:items){
-            String itemName=item.getName();
-            totalAmount+=calculateAmount(itemName);
+        for(int itemId:itemIds){
+            totalAmount+=calculateAmount(itemId);
         }
         return totalAmount;
     }
-    public String addItemToInvoice(List<Item>items,int invoiceNumber,int customerId){
+    public List<Item> getItems(List<Integer>itemIds){
+        List<Item>items=new ArrayList<>();
+        for (int itemId:itemIds){
+            items.add(getItem(itemId));
+        }
+        return items;
+    }
+    public String addItemToInvoice(List<Integer>itemIds,int invoiceNumber,int customerId){
+
         Map<Integer, Invoice> invoices=cache.getInvoices();
         Map<Integer,Customer>customerDetails= cache.getCustomerDetails();
         if(!checkCustomerId(customerId)){
             return "Invalid Customer Id";
         }
         Customer customer=customerDetails.get(customerId);
-        if(!checkInvoiceNumber(invoiceNumber)){
+        if(!checkInvoiceNumber(invoiceNumber,customerId)){
             return "Invalid Invoice Number";
         }
         Invoice invoice=invoices.get(invoiceNumber);
-        invoice.setItems(items);
+        invoice.setItems(itemIds);
         customer.setInvoices(invoice);
         return "Item added SuccessFully";
     }
@@ -92,8 +118,8 @@ public class ProgramDriver {
         }
         Set<Integer>invoiceNumbers=invoices.keySet();
         for(int invoiceNumber:invoiceNumbers){
-            Invoice invoice=invoices.get(invoiceNumber);
-            stringBuilder.append(invoice);
+
+            stringBuilder.append(getInvoiceDetails(invoiceNumber));
         }
         return stringBuilder;
     }
@@ -110,8 +136,7 @@ public class ProgramDriver {
         }
         Set<Integer>invoiceNumbers=invoices.keySet();
         for(int invoiceNumber:invoiceNumbers){
-            Invoice invoice=invoices.get(invoiceNumber);
-            stringBuilder.append(invoice);
+            stringBuilder.append(getInvoiceDetails(invoiceNumber));
         }
 
         return stringBuilder;
@@ -121,8 +146,7 @@ public class ProgramDriver {
         if(!checkInvoiceNumber(invoiceNumber)){
             return "Invalid Invoice Number";
         }
-       Invoice invoice= invoices.get(invoiceNumber);
-       return invoice.toString();
+       return getInvoiceDetails(invoiceNumber);
     }
     public boolean checkCustomerId(int customerId){
         Map<Integer,Customer>customerDetails= cache.getCustomerDetails();
@@ -132,15 +156,26 @@ public class ProgramDriver {
         Map<Integer, Invoice> invoices=cache.getInvoices();
         return invoices.containsKey(invoiceNumber);
     }
-    public StringBuilder getItems(){
-        int i=1;
-        StringBuilder stringBuilder=new StringBuilder();
-        Map<String,Integer>items=cache.getItems();
-        Set<String>itemNames=items.keySet();
-        for(String itemName:itemNames){
-            stringBuilder.append(i+"."+itemName+" : "+items.get(itemName)+"   ");
-            i++;
+    public boolean checkInvoiceNumber(int invoiceNumber,int customerId){
+        Customer customer=cache.getCustomerDetails().get(customerId);
+        Map<Integer,Invoice>invoices=customer.getInvoices();
+        return invoices.containsKey(invoiceNumber);
+    }
+    public List<Item> getItems(){
+        Map<Integer, Item> items=cache.getItems();
+        Set<Integer> itemIds=items.keySet();
+        List<Item>allItems=new ArrayList<>();
+        for(int itemId:itemIds){
+            Item item=items.get(itemId);
+            allItems.add(item);
         }
-        return stringBuilder;
+        return allItems;
+    }
+    public Item getItem(int itemId){
+        Map<Integer, Item> items=cache.getItems();
+        return items.get(itemId);
+    }
+    public boolean checkItemId(int itemId){
+        return cache.getItems().containsKey(itemId);
     }
 }
