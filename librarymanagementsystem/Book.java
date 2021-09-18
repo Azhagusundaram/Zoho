@@ -8,6 +8,16 @@ public class Book {
     private int bookId;
     private String status;
 
+    public int getSimilarBookId() {
+        return similarBookId;
+    }
+
+    public void setSimilarBookId(int similarBookId) {
+        this.similarBookId = similarBookId;
+    }
+
+    private int similarBookId;
+
     public String getStatus() {
         return status;
     }
@@ -57,7 +67,7 @@ public class Book {
     }
     @Override
     public String toString(){
-        return "Book Id :"+bookId+" Title :"+title+" Author :"+author+" Publication :"+publication+" Subject :"+subject;
+        return "Book Id :"+bookId+" Title :"+title+" Author :"+author+" Publication :"+publication+" Subject :"+subject+" Similar Book Id :"+similarBookId;
     }
 }
 //3

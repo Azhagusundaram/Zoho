@@ -1,19 +1,23 @@
 package librarymanagementsystem;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ProgramDriver {
-    private int bookId=0;
     private int memberId=0;
-    private long date;
     LibraryManagement cache=new LibraryManagement();
     public void initialSetUp(List<Book> books){
         for(Book book:books){
-            bookId++;
-            book.setBookId(bookId);
             cache.setAllBooks(book);
+        }
+    }
+    public void initialSetUp1(List<SimilarBooks>similarBooks){
+        for(SimilarBooks similarBook:similarBooks){
+            List<Integer>bookIds=similarBook.getBookIds();
+            int bookId=bookIds.get(0);
+            Book book=cache.getAllBooks().get(bookId);
+            cache.setSimilarBooks(similarBook);
             cache.setAuthorBasedBooks(book);
             cache.setPublicationBasedBooks(book);
             cache.setSubjectBasedBooks(book);
@@ -28,55 +32,67 @@ public class ProgramDriver {
     }
 
     private List<Book> searchByTitle(String title){
-        Map<String,List<Book>>titleBasedBook= cache.getTitleBasedBooks();
-        List<Book>books=titleBasedBook.get(title);
+        Map<String,List<Integer>>titleBasedBook= cache.getTitleBasedBooks();
+        List<Integer>bookIds=titleBasedBook.get(title);
+        if(bookIds==null){
+            return null;
+        }
+        List<Book> books = getBooks(bookIds);
         return books;
 //        Set<String> set = titleBasedBook.keySet().stream().filter((String s) -> s.startsWith(title)).collect(Collectors.toSet());
     }
+
+    private List<Book> getBooks(List<Integer> bookIds) {
+        List<Book>books=new ArrayList<>();
+        for (int bookId: bookIds){
+            Book book=cache.getAllBooks().get(bookId);
+            books.add(book);
+        }
+        return books;
+    }
+
     private List<Book> searchByAuthor(String author){
         System.out.println(cache.getAuthorBasedBooks());
-        List<Book>books=cache.getAuthorBasedBooks().get(author);
+        List<Integer>bookIds=cache.getAuthorBasedBooks().get(author);
+        if(bookIds==null){
+            return null;
+        }
+        List<Book> books = getBooks(bookIds);
         return books;
     }
     private List<Book> searchBySubject(String subject){
-        List<Book>books=cache.getSubjectBasedBooks().get(subject);
+        List<Integer>bookIds=cache.getSubjectBasedBooks().get(subject);
+        if(bookIds==null){
+            return null;
+        }
+        List<Book> books = getBooks(bookIds);
         return books;
     }
     private List<Book> searchByPublication(String publication){
-        List<Book>books=cache.getPublicationBasedBooks().get(publication);
+        List<Integer>bookIds=cache.getPublicationBasedBooks().get(publication);
+        if(bookIds==null){
+            return null;
+        }
+        List<Book> books = getBooks(bookIds);
         return books;
     }
-    public Map<Integer, Book> searchBooks(String name, String search){
+    public List<Book> searchBooks(String name, String search){
         if(search.equalsIgnoreCase("Title")){
             List<Book>books=searchByTitle(name);
-            System.out.println(search);
-            return bookWithOrder(books);
+            return books;
         }else if(search.equalsIgnoreCase("Author")){
-            System.out.println(search);
             List<Book>books=searchByAuthor(name);
-            return bookWithOrder(books);
+            return books;
         }else if(search.equalsIgnoreCase("Subject")){
-            System.out.println(search);
             List<Book>books=searchBySubject(name);
-            return bookWithOrder(books);
+            return books;
         }else if(search.equalsIgnoreCase("Publication")){
-            System.out.println(search);
             List<Book>books=searchByPublication(name);
-            return bookWithOrder(books);
+            return books;
         }
         return null;
     }
-    public Map<Integer, Book> bookWithOrder(List<Book>books){
-        Map<Integer,Book>orderedBook=new HashMap<>();
-        if(books!=null){
-            int i=1;
-            for(Book book:books){
-                orderedBook.put(i,book);
-                i++;
-            }
-        }
-        return orderedBook;
-    }
+
     public String checkOutBook(Book book, int memberId){
         int bookId=book.getBookId();
         String status=book.getStatus();
@@ -95,10 +111,10 @@ public class ProgramDriver {
         return "Book Successfully Checkout";
     }
     public String setReservedBook(Book book,int memberId){
-        int bookId=book.getBookId();
+        int similarBookId =book.getSimilarBookId();
         Member member=cache.getMembers().get(memberId);
-        cache.setReservedBooks(bookId,memberId);
-        member.setReservedBooks(book);
+        cache.setReservedBooks(similarBookId,memberId);
+        member.setReservedBooks(similarBookId);
         return "Book reserved Successfully";
     }
     public String returnBook(int bookId,int memberId){
@@ -112,13 +128,12 @@ public class ProgramDriver {
             int fineAmount=calculateFine(checkOutDate,returnDate);
             member.setTotalFineAmount(fineAmount);
             member.getCheckOutBook().remove(bookId);
-            getReservedBook(bookId);
+            int similarBookId=book.getSimilarBookId();
+            getReservedBook(similarBookId);
             return "Your fine Amount is "+fineAmount;
         }else {
             return "Invalid book id";
         }
-
-
     }
     public boolean checkCheckOutBooks(int bookId, int memberId){
         Member member=cache.getMembers().get(memberId);
@@ -126,20 +141,40 @@ public class ProgramDriver {
 
     }
     public boolean checkBookId(int bookId){
+
         return cache.getAllBooks().containsKey(bookId);
     }
-    private void getReservedBook(int bookId) {
-        Map<Integer, List<Integer>> reservedBooks=cache.getReservedBooks();
-        Book book=cache.getAllBooks().get(bookId);
-        List<Integer> memberIds =reservedBooks.get(bookId);
-        if (memberIds != null&&!memberIds.isEmpty()) {
-            int memberId=memberIds.get(0);
-            Member member=cache.getMembers().get(memberId);
-            member.setNotifications(book+" is available");
-            member.removeReservedBook(book);
-            memberIds.remove((Integer) memberId);
+    public boolean checkSimilarBookId(int similarBookId){
+        return cache.getSimilarBooks().containsKey(similarBookId);
+    }
+    public Book getAvailableBook(int similarBookId){
+        SimilarBooks similarBooks=cache.getSimilarBooks().get(similarBookId);
+        List<Integer>bookIds=similarBooks.getBookIds();
+        for(int bookId:bookIds){
+            Book book=cache.getAllBooks().get(bookId);
+            String status=book.getStatus();
+            if(status.startsWith("A")){
+                return book;
+            }
         }
-
+        int bookId=bookIds.size()-1;
+        Book book=cache.getAllBooks().get(bookId);
+        return book;
+    }
+    private void getReservedBook(int similarBookId) {
+        Map<Integer, List<Integer>> reservedBooks=cache.getReservedBooks();
+        SimilarBooks similarBook=cache.getSimilarBooks().get(similarBookId);
+        int bookId=similarBook.getBookIds().get(0);
+        Book book=cache.getAllBooks().get(bookId);
+        List<Integer> memberIds =reservedBooks.get(similarBookId);
+        if (memberIds != null&&!memberIds.isEmpty()) {
+            for(int memberId:memberIds){
+                Member member=cache.getMembers().get(memberId);
+                member.setNotifications(book+" is available");
+                member.removeReservedBook(similarBookId);
+                memberIds.remove((Integer) memberId);
+            }
+        }
     }
     public List<String> getNotifications(int memberId){
         Member member=cache.getMembers().get(memberId);

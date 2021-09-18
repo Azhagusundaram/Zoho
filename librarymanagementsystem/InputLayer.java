@@ -3,14 +3,19 @@ package librarymanagementsystem;
 import java.util.*;
 
 public class InputLayer {
+    static ProgramDriver driver=new ProgramDriver();
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver=new ProgramDriver();
+        int bookId=1;
+        int similarBookId=1;
         System.out.println("Number of books");
         int numOfBooks=scan.nextInt();
         scan.nextLine();
-        List<Book>books=new ArrayList<>(numOfBooks);
+        List<SimilarBooks>books=new ArrayList<>(numOfBooks);
+        List<Book>totalBooks=new ArrayList<>();
         for (int i=0;i<numOfBooks;i++){
+            SimilarBooks similarBooks=new SimilarBooks();
+            similarBooks.setSimilarBookId(similarBookId);
             System.out.println("Title");
             String title=scan.nextLine();
             System.out.println("Author");
@@ -19,10 +24,22 @@ public class InputLayer {
             String subject=scan.nextLine();
             System.out.println("Publication");
             String publication=scan.nextLine();
-            Book book = getBook(title, author, subject, publication);
-            books.add(book);
+            System.out.println("Number of Copies:");
+            int numOfCopies=scan.nextInt();
+            scan.nextLine();
+            for(int j=0;j<numOfCopies;j++){
+                Book book = getBook(title, author, subject, publication);
+                book.setBookId(bookId);
+                book.setSimilarBookId(similarBookId);
+                totalBooks.add(book);
+                similarBooks.setBookIds(bookId);
+                bookId++;
+            }
+            books.add(similarBooks);
+            similarBookId++;
         }
-        driver.initialSetUp(books);
+        driver.initialSetUp(totalBooks);
+        driver.initialSetUp1(books);
         while (true){
             System.out.println("1.Add member Account\n2.Existing member");
             int decision=scan.nextInt();
@@ -46,9 +63,9 @@ public class InputLayer {
                             searchBook(scan, driver, memberId);
                         } else if (decision1 == 2) {
                             System.out.println("enter the book id");
-                            int bookId = scan.nextInt();
-                            if (driver.checkBookId(bookId)) {
-                                String result = driver.returnBook(bookId, memberId);
+                            int id = scan.nextInt();
+                            if (driver.checkBookId(id)) {
+                                String result = driver.returnBook(id, memberId);
                                 System.out.println(result);
                             } else {
                                 System.out.println("Wrong bookId");
@@ -90,22 +107,22 @@ public class InputLayer {
             if(decision2 ==1){
                 System.out.println("Enter the title :");
                 String title= scan.nextLine();
-                Map<Integer, Book>books= driver.searchBooks(title,"Title");
+                List<Book>books= driver.searchBooks(title,"Title");
                 checkOutBook(scan, driver, memberId, books);
             }else if(decision2 ==2){
                 System.out.println("Enter the Author :");
                 String title= scan.nextLine();
-                Map<Integer, Book>books= driver.searchBooks(title,"Author");
+                List<Book>books= driver.searchBooks(title,"Author");
                 checkOutBook(scan, driver, memberId, books);
             }else if(decision2 ==3){
                 System.out.println("Enter the Publication :");
                 String title= scan.nextLine();
-                Map<Integer, Book>books= driver.searchBooks(title,"Publication");
+                List<Book>books= driver.searchBooks(title,"Publication");
                 checkOutBook(scan, driver, memberId, books);
             }else if(decision2 ==4){
                 System.out.println("Enter the Subject :");
                 String title= scan.nextLine();
-                Map<Integer, Book>books= driver.searchBooks(title,"Subject");
+                List<Book>books= driver.searchBooks(title,"Subject");
                 checkOutBook(scan, driver, memberId, books);
             }else if(decision2==5){
                 break;
@@ -113,10 +130,14 @@ public class InputLayer {
         }
     }
 
-    private static void checkOutBook(Scanner scan, ProgramDriver driver, int memberId, Map<Integer, Book> books) {
+    private static void checkOutBook(Scanner scan, ProgramDriver driver, int memberId, List<Book> books) {
+        if(books==null||books.isEmpty()){
+            System.out.println("No Books for your search");
+            return;
+        }
         Book book=printBooks(scan, books);
         if(book==null){
-            System.out.println("No Books for your search");
+            System.out.println("Invalid book Id");
             return;
         }
         System.out.println("Are you checkOut the book(yes=1/no=0)");
@@ -135,22 +156,19 @@ public class InputLayer {
         }
     }
 
-    private static Book printBooks(Scanner scan, Map<Integer,Book>books){
-        Set<Integer>serialNumbers=books.keySet();
-        if(books.isEmpty()){
-            return null;
+    private static Book printBooks(Scanner scan, List<Book>books){
+
+        for (Book book:books){
+            System.out.println(book);
         }
-        for(int serialNumber:serialNumbers ){
-            System.out.println(serialNumber+"."+books.get(serialNumber));
-        }
-        System.out.println("Enter the book Number");
-        int decision=scan.nextInt();
-        while (decision> serialNumbers.size()||decision<=0){
-            System.out.println("Enter correct number:");
-            decision=scan.nextInt();
-        }
+        System.out.println("Enter the Similar Book Id");
+        int similarBookId=scan.nextInt();
         scan.nextLine();
-        Book book=books.get(decision);
-        return book;
+        if(driver.checkSimilarBookId(similarBookId)){
+            Book book= driver.getAvailableBook(similarBookId);
+            return book;
+        }
+       return null;
+
     }
 }

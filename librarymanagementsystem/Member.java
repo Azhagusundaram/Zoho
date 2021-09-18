@@ -9,15 +9,15 @@ public class Member {
     private int memberId;
     private String name;
     private Map<Integer,CheckOutBook> checkOutBook=new HashMap<>();
-    private List<Book>reservedBook=new ArrayList<>();
+    private List<Integer>reservedBook=new ArrayList<>();
     private int totalFineAmount;
     private List<String>notifications=new ArrayList<>();
 
-    public void setReservedBooks(Book book){
-        reservedBook.add(book)  ;
+    public void setReservedBooks(int similarBookId){
+        reservedBook.add(similarBookId)  ;
     }
-    public void removeReservedBook(Book book){
-        reservedBook.remove(book);
+    public void removeReservedBook(int similarBookId){
+        reservedBook.remove(similarBookId);
     }
     public void setNotifications(String notification) {
         notifications.add(notification);
