@@ -1,6 +1,6 @@
 package virtualclassroom;
 
-public class Student extends Login {
+public class Student extends User {
     private int standard;
     private String accessType;
     private int id;

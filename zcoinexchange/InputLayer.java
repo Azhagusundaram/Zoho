@@ -6,8 +6,9 @@ import java.util.regex.Pattern;
 
 public class InputLayer {
     public static void main(String[] args) {
-        ProgramDriver driver =new ProgramDriver();
+        ZCoinExchangeDriver driver =new ZCoinExchangeDriver();
         Scanner scan=new Scanner(System.in);
+
         while (true){
             System.out.println("1.Add account\n2.Login\n3.Exit");
             int decision=scan.nextInt();
@@ -163,7 +164,7 @@ public class InputLayer {
 
     }
 
-    private static void doZcTransaction(ProgramDriver driver, Scanner scan, String mailId) {
+    private static void doZcTransaction(ZCoinExchangeDriver driver, Scanner scan, String mailId) {
         System.out.println("1.Deposit\n2.withdraw");
         int decision3= scan.nextInt();
         scan.nextLine();
@@ -198,7 +199,7 @@ public class InputLayer {
         }
     }
 
-    private static void doRcTransaction(ProgramDriver driver, Scanner scan, String mailId) {
+    private static void doRcTransaction(ZCoinExchangeDriver driver, Scanner scan, String mailId) {
         System.out.println("1.Deposit\n2.Withdraw\n3.Rc to Zc conversion");
         int decision3= scan.nextInt();
         scan.nextLine();
@@ -238,7 +239,7 @@ public class InputLayer {
         }
     }
 
-    private static void changePassword(ProgramDriver driver, Scanner scan, String mailId, String password) {
+    private static void changePassword(ZCoinExchangeDriver driver, Scanner scan, String mailId, String password) {
         System.out.println("Enter Old Password");
         String oldPassword= scan.nextLine();
         if(driver.checkUserLoginCredentials(mailId,oldPassword)){
@@ -250,7 +251,7 @@ public class InputLayer {
         }
     }
 
-    private static void viewTransaction(ProgramDriver driver, String mailId) {
+    private static void viewTransaction(ZCoinExchangeDriver driver, String mailId) {
         List<String>rcTransaction= driver.viewTransaction(mailId,1);
         System.out.println("Rc Transactions");
         printTransaction(rcTransaction);
@@ -259,7 +260,7 @@ public class InputLayer {
         printTransaction(zcTransaction);
     }
 
-    private static void accountDetails(ProgramDriver driver, Scanner scan,String mailId) {
+    private static void accountDetails(ZCoinExchangeDriver driver, Scanner scan, String mailId) {
         int zid;
         System.out.println("Enter the Zid");
         zid= scan.nextInt();

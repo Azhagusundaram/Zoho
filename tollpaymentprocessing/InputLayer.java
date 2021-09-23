@@ -6,7 +6,7 @@ public class InputLayer {
     static List<String>stops;
     static Scanner scan=new Scanner(System.in);
     public static void main(String[] args) {
-        ProgramDriver driver=new ProgramDriver();
+        TollDriver driver=new TollDriver();
         stops=new ArrayList<>(Arrays.asList("A","B","C","D","E","F","G","H"));
         driver.setStops(stops);
         Map<String,List<Integer>>chargingScheme=new HashMap<>();

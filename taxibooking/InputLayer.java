@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver=new ProgramDriver();
+        TaxiBookingDriver driver=new TaxiBookingDriver();
         System.out.println("Number of Taxis : ");
         int numOfTaxis=scan.nextInt();
         driver.initialSetUp(numOfTaxis);

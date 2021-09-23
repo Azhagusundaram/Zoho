@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver= new ProgramDriver();
+        VirtualClassRoomDriver driver= new VirtualClassRoomDriver();
         String adminName="admin";
         String adminPassword="admin123";
         Admin admin=new Admin();
@@ -174,7 +174,7 @@ public class InputLayer {
         }
     }
 
-    private static void facultyLogin(Scanner scan, ProgramDriver driver, int id) {
+    private static void facultyLogin(Scanner scan, VirtualClassRoomDriver driver, int id) {
         while (true){
             System.out.println("1.Edit Account\n2.Add StudyMaterials\n3.Delete Study Material\n4.view Doubt\n5.add Answers\n6.exit");
             int decision2= scan.nextInt();
@@ -224,7 +224,7 @@ public class InputLayer {
         return faculty;
     }
 
-    private static void studentLogin(Scanner scan, ProgramDriver driver, int id) {
+    private static void studentLogin(Scanner scan, VirtualClassRoomDriver driver, int id) {
         while (true){
             System.out.println("1.Edit Account\n2.View StudyMaterials\n3.Ask Doubt\n4.View Answers\n5.exit");
             int decision2= scan.nextInt();
@@ -250,7 +250,7 @@ public class InputLayer {
         }
     }
 
-    private static void editProfile(Scanner scan,Login student) {
+    private static void editProfile(Scanner scan, User student) {
 
         while (true){
             System.out.println("1.Name\n2.Age\n3.mobile number\n4.gender\n5.password\n6.exit");

@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver= new ProgramDriver();
+        BookingDriver driver= new BookingDriver();
         driver.initialSetUp();
         while (true){
             System.out.println("Choose the decision :");

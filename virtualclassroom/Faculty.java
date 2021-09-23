@@ -1,6 +1,6 @@
 package virtualclassroom;
 
-public class Faculty extends Login {
+public class Faculty extends User {
     private String subject;
     private String accessType;
     private int id;

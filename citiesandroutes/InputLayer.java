@@ -8,7 +8,7 @@ import java.util.Set;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver=new ProgramDriver();
+        CityRoutesDriver driver=new CityRoutesDriver();
         driver.initialSetUp();
         while(true){
             System.out.println("1.ListCities\n2.Find city\n3.Shortest Route\n4.Print routes\n5.Add route\n6.Delete route\n7.Busy city\n8.exit");

@@ -1,6 +1,6 @@
 package virtualclassroom;
 
-public class Admin extends Login{
+public class Admin extends User {
     String accessType;
     private int id;
 

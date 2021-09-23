@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class InputLayer {
     public static void main(String[] args) {
-        ProgramDriver driver=new ProgramDriver();
+        CarShowroomDriver driver=new CarShowroomDriver();
         Scanner scan=new Scanner(System.in);
         System.out.println("Number of Cities");
         int branchId=1;
@@ -140,7 +140,7 @@ public class InputLayer {
 
     }
 
-    private static int dispatchCar(ProgramDriver driver, Scanner scan, int carId) {
+    private static int dispatchCar(CarShowroomDriver driver, Scanner scan, int carId) {
         System.out.println(driver.getCities());
         System.out.println("enter city Id");
         int cityId1= scan.nextInt();
@@ -189,7 +189,7 @@ public class InputLayer {
         return carId;
     }
 
-    private static void setCar(ProgramDriver driver, int carId, String carName) {
+    private static void setCar(CarShowroomDriver driver, int carId, String carName) {
         Car car=new Car();
         car.setCarId(carId);
         car.setCarName(carName);

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class InputLayer {
     public static void main(String[] args) {
-        ProgramDriver driver = new ProgramDriver();
+        OrderDriver driver = new OrderDriver();
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Number of hotels");
@@ -125,7 +125,7 @@ public class InputLayer {
         return customer;
     }
 
-    private static void orderFood(ProgramDriver driver, Scanner scan, String emailId, List<String> hotels) {
+    private static void orderFood(OrderDriver driver, Scanner scan, String emailId, List<String> hotels) {
         System.out.println(hotels);
         System.out.println("Enter hotel Number");
         int index = scan.nextInt() - 1;

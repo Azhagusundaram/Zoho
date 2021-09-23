@@ -3,7 +3,7 @@ package librarymanagementsystem;
 import java.util.*;
 
 public class InputLayer {
-    static ProgramDriver driver=new ProgramDriver();
+    static LibrarySystemDriver driver=new LibrarySystemDriver();
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
         int bookId=1;
@@ -99,7 +99,7 @@ public class InputLayer {
         return book;
     }
 
-    private static void searchBook(Scanner scan, ProgramDriver driver, int memberId) {
+    private static void searchBook(Scanner scan, LibrarySystemDriver driver, int memberId) {
         while (true){
             System.out.println("1.Search by title\n2.search by author\n3.search by publications\n4.search by subject\n5.Exit");
             int decision2 = scan.nextInt();
@@ -130,7 +130,7 @@ public class InputLayer {
         }
     }
 
-    private static void checkOutBook(Scanner scan, ProgramDriver driver, int memberId, List<Book> books) {
+    private static void checkOutBook(Scanner scan, LibrarySystemDriver driver, int memberId, List<Book> books) {
         if(books==null||books.isEmpty()){
             System.out.println("No Books for your search");
             return;

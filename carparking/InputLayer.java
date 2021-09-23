@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan= new Scanner(System.in);
-        ProgramDriver driver=new ProgramDriver();
+        CarParkingDriver driver=new CarParkingDriver();
         System.out.println("Enter number of Floors : ");
         int numOfFloor=scan.nextInt();
         System.out.println("Number of slots in each floor : ");
