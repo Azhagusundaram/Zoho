@@ -4,7 +4,7 @@ import java.util.*;
 
 public class InputLayer {
     public static void main(String[] args) {
-        ProgramDriver driver=new ProgramDriver();
+        BookingDriver driver=new BookingDriver();
         Scanner scan=new Scanner(System.in);
         driver.initialSetUp();
         int bookingId=1;

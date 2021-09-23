@@ -6,7 +6,7 @@ public class InputLayer {
     static  Scanner scan=new Scanner(System.in);
     public static void main(String[] args) {
 
-        ProgramDriver driver=new ProgramDriver();
+        BookingDriver driver=new BookingDriver();
         List<Movie>movies=initialSetUp();
         driver.initialSetUp(movies);
 
