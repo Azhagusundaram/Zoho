@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class InputLayer {
     public static void main(String[] args) {
         Scanner scan=new Scanner(System.in);
-        ProgramDriver driver=new ProgramDriver();
+        InvoiceDriver driver=new InvoiceDriver();
         System.out.println("Enter number of items to add");
         int num=scan.nextInt();
         scan.nextLine();
@@ -75,7 +75,7 @@ public class InputLayer {
 
     }
 
-    private static void createInvoice(Scanner scan, ProgramDriver driver, List<Item> items) {
+    private static void createInvoice(Scanner scan, InvoiceDriver driver, List<Item> items) {
         System.out.println("Enter customer id :");
         int customerId= scan.nextInt();
 
@@ -88,7 +88,7 @@ public class InputLayer {
         }
     }
 
-    private static List<Integer> chooseItem(Scanner scan, ProgramDriver driver, List<Item> items) {
+    private static List<Integer> chooseItem(Scanner scan, InvoiceDriver driver, List<Item> items) {
         int flag=1;
         List<Integer>allItem=new ArrayList<>();
         while (flag ==1){
@@ -107,7 +107,7 @@ public class InputLayer {
         return allItem;
     }
 
-    private static void createCustomer(Scanner scan, ProgramDriver driver) {
+    private static void createCustomer(Scanner scan, InvoiceDriver driver) {
         System.out.println("Name");
         String name= scan.nextLine();
         System.out.println("Address : ");
