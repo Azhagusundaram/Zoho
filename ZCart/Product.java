@@ -56,5 +56,8 @@ public class Product {
         this.stock+= stock;
     }
 
+    public String toString(){
+        return itemId+"\t"+brand+"\t"+model+"\t"+price;
+    }
 
 }

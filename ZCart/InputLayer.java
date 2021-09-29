@@ -37,7 +37,11 @@ public class InputLayer {
                                     shopProducts(scan, driver, userName);
                                 }else if(decision2==2){
                                     List<Invoice>invoices=driver.getInvoices(userName);
-                                    System.out.println(invoices);
+                                    if(invoices.isEmpty()){
+                                        System.out.println("No orders");
+                                    }else {
+                                        System.out.println(invoices);
+                                    }
                                 }else if(decision2==3){
 
                                 }else if(decision2==4){
@@ -70,12 +74,17 @@ public class InputLayer {
                         }else if(choice==2){
                             List<Product>products=driver.getLessStocks();
                             printProducts(products);
-                            System.out.println("1=Re-order/otherwise=No Order");
-                            int reOrder=scan.nextInt();
-                            scan.nextLine();
-                            if(reOrder==1){
-                                driver.reOrder(products);
+                            if(products!=null&&!products.isEmpty()){
+                                System.out.println("1=Re-order/otherwise=No Order");
+                                int reOrder=scan.nextInt();
+                                scan.nextLine();
+                                if(reOrder==1){
+                                    driver.reOrder(products);
+                                }
+                            }else {
+                                System.out.println("No product for re order");
                             }
+
                         }else if(choice==3){
                             break;
                         }
@@ -88,7 +97,7 @@ public class InputLayer {
                            password= scan.nextLine();
                            System.out.println("Re enter Password");
                            password1= scan.nextLine();
-                       }while (!driver.checkPassword(password)&&!password.equals(password1));
+                       }while (!driver.checkPassword(password)||!password.equals(password1));
                        driver.setAdminPassword(password);
                     }
                 }
@@ -137,17 +146,24 @@ public class InputLayer {
             String category="Mobile";
             Collection<Product>products= driver.getProduct(category);
             printProducts(products);
-            orderItems(scan, driver, userName, category);
+            if(products!=null&&!products.isEmpty()){
+                orderItems(scan, driver, userName, category);
+            }
+
         }else if(choice==2){
             String category="Laptop";
             Collection<Product>products= driver.getProduct(category);
             printProducts(products);
-            orderItems(scan, driver, userName, category);
+            if(products!=null&&!products.isEmpty()){
+                orderItems(scan, driver, userName, category);
+            }
         }else if(choice==3){
             String category="Tablet";
             Collection<Product>products= driver.getProduct(category);
             printProducts(products);
-            orderItems(scan, driver, userName, category);
+            if(products!=null&&!products.isEmpty()){
+                orderItems(scan, driver, userName, category);
+            }
         }
     }
 
@@ -169,6 +185,7 @@ public class InputLayer {
                 }
                 System.out.println("Continue Order(Yes=1/No=2)");
                 orderChoice= scan.nextInt();
+                scan.nextLine();
             }
             System.out.println("Coupon Code(yes=enter coupon code/otherwise=nil)");
             String couponCode= scan.nextLine();
@@ -178,8 +195,16 @@ public class InputLayer {
     }
 
     private static void printProducts(Collection<Product> products) {
-        for(Product product: products){
-            System.out.println(product);
+        if(products!=null){
+            if(products.isEmpty()){
+                System.out.println("Products is empty");
+            }else {
+                for(Product product: products){
+                    System.out.println(product);
+                }
+            }
+        }else {
+            System.out.println("No products");
         }
     }
 
@@ -192,7 +217,7 @@ public class InputLayer {
         String password= scan.nextLine();
         System.out.println("Re enter Password");
         String password1= scan.nextLine();
-        while (!driver.checkPassword(password)&&!password.equals(password1)){
+        while (!driver.checkPassword(password)||!password.equals(password1)){
             System.out.println("password must in Alphanumeric");
             System.out.println("Password");
             password= scan.nextLine();

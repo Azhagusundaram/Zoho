@@ -118,6 +118,11 @@ public class ZCartDriver {
     }
     private void createFile(String userName){
         File file=new File(userName+".txt");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     private void updateFile(Customer customer){
         String name=customer.getName();
@@ -126,7 +131,7 @@ public class ZCartDriver {
         long mobile=customer.getMobileNumber();
         String str=name+":"+userName+":"+password+":"+mobile;
         try {
-            FileWriter fileWriter=new FileWriter("customer.txt");
+            FileWriter fileWriter=new FileWriter("customer.txt",true);
             BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
             bufferedWriter.write(str);
             bufferedWriter.close();
@@ -144,7 +149,7 @@ public class ZCartDriver {
         double price= product.getPrice();
         String str=productId+":"+category+":"+brand+":"+model+":"+price+":"+stock;
         try {
-            FileWriter fileWriter=new FileWriter("products.txt");
+            FileWriter fileWriter=new FileWriter("products.txt",true);
             BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
             bufferedWriter.write(str);
             bufferedWriter.close();
@@ -170,7 +175,7 @@ public class ZCartDriver {
         int invoiceNumber=invoice.getInvoiceNumber();
         String str="Invoice:"+invoiceNumber;
         try {
-            FileWriter fileWriter=new FileWriter(userName+".txt");
+            FileWriter fileWriter=new FileWriter(userName+".txt",true);
             BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
             bufferedWriter.write(str);
             bufferedWriter.close();
@@ -187,7 +192,7 @@ public class ZCartDriver {
     }
     public Collection<Product> getProduct(String category){
         Map<Integer,Product> products=cache.getProductDetails().get(category);
-        if(products!=null){
+        if(products==null){
             return null;
         }
         return products.values();
@@ -271,24 +276,27 @@ public class ZCartDriver {
     }
     public String createCouponCode(Customer customer){
         String alphaNumeric="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        String code="";
+        StringBuilder code=new StringBuilder();
         for (int i=0;i<6;i++){
             int index= (int) (alphaNumeric.length()*Math.random());
-            code+=alphaNumeric.charAt(index);
+            code.append(alphaNumeric.charAt(index));
         }
-        return code;
+        return code.toString();
     }
     public int checkCouponCode(String couponCode,String userName){
         Customer customer=cache.getCustomerDetails().get(userName);
         Map<String,Integer>coupon=customer.getCoupon();
-        int number=coupon.get(couponCode);
-        if(number==0){
-          return 0;
-        }
-        coupon.put(couponCode,number-1);
+        if(coupon!=null&&!coupon.isEmpty()){
+            int number=coupon.get(couponCode);
+            if(number==0){
+                return 0;
+            }
+            coupon.put(couponCode,number-1);
 
-        int discount= (int) (Math.random() * (30 - 20 + 1)+20);
-        return discount;
+            int discount= (int) (Math.random() * (30 - 20 + 1)+20);
+            return discount;
+        }
+        return 0;
     }
     public boolean checkPassword(String password){
         if (Pattern.matches("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,20}",password)){
@@ -298,7 +306,7 @@ public class ZCartDriver {
     }
     private String encryptPassword(String password){
         char[]chars=password.toCharArray();
-        String encryptedPassword="";
+        StringBuilder encryptedPassword=new StringBuilder();
         char k;
         for(char c:chars){
             if(c=='Z'){
@@ -311,13 +319,13 @@ public class ZCartDriver {
             }else {
                 k= (char) (c+1);
             }
-            encryptedPassword+=k;
+            encryptedPassword.append(k);
         }
-        return encryptedPassword;
+        return encryptedPassword.toString();
     }
     private String decryptPassword(String password){
         char[]chars=password.toCharArray();
-        String decrypted ="";
+        StringBuilder decrypted =new StringBuilder();
         char k;
         for(char c:chars){
             if(c=='A'){
@@ -330,9 +338,9 @@ public class ZCartDriver {
             }else {
                 k= (char) (c-1);
             }
-            decrypted +=k;
+            decrypted.append(k);
         }
-        return decrypted;
+        return decrypted.toString();
     }
     public boolean userLogin(String userName,String password){
         Customer customer= cache.getCustomerDetails().get(userName);

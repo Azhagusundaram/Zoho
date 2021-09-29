@@ -57,4 +57,7 @@ public class Invoice {
     public void setBalance(double balance) {
         this.balance = balance;
     }
+    public String toString(){
+        return "Total Amount:"+totalAmount+"\nDiscount:"+savingAmount+"\nBalance:"+(totalAmount-savingAmount);
+    }
 }

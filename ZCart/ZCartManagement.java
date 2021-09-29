@@ -38,7 +38,7 @@ public class ZCartManagement {
         String category= product.getCategory();
         int productId= product.getItemId();
         Map<Integer,Product>items=productDetails.get(category);
-        if(category==null){
+        if(items==null){
             items=new HashMap<>();
             productDetails.put(category,items);
         }
