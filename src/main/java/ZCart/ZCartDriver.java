@@ -1,11 +1,17 @@
 package ZCart;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class ZCartDriver {
 	
+	private ZCartDriver() {
+    	
+    }
     private int productId=1;
     private int invoiceNumber=1;
     private List<Integer> highStockProductId=new ArrayList<>();
@@ -13,8 +19,20 @@ public class ZCartDriver {
     private static final String adminUser="admin@zoho.com";
     private   static  String adminPassword="xyzzy";
     ZCartManagement cache=new ZCartManagement();
-    private ZCartDriver() {
-    	
+    PersistenceLayer database=null;
+    
+    public void initSet() {
+        try (FileReader fileReader = new FileReader("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/interfaces.properties")){
+            Properties prop=new Properties();
+            prop.load(fileReader);
+            String className=prop.getProperty("mysql");
+            System.out.println(className);
+            Class c = Class.forName(className);
+            Constructor cons = c.getConstructor();
+            database = (PersistenceLayer)cons.newInstance();
+        } catch ( IOException | SecurityException | NoSuchMethodException | InvocationTargetException | ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException e) {
+            e.printStackTrace();
+        } 
     }
     private static class SingleTon{
     	private static final ZCartDriver INSTANCE=new ZCartDriver();
@@ -23,13 +41,66 @@ public class ZCartDriver {
     	return SingleTon.INSTANCE;
     }
     public void initialSetUp(){
-        try {
-            setProductDetails();
-            setCustomerDetails();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+        	initSet();
+//        	setCustomerDetails();
+//        	setProductDetails();
+//            setProductDetails();
+//            setCustomerDetails();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+      
     }
+    public boolean signUp(Customer customer) throws SQLException{
+    	String userName=customer.getUserName();  
+    	Customer customer1=cache.getCustomerDetails().get(userName);
+    	if(customer1!=null) {
+    		cache.setCustomerDetails(customer1);
+    		return false;
+    	}
+    	customer1=database.getCustomerDetails(userName);
+    	if(customer1!=null) {
+    		cache.setCustomerDetails(customer1);
+    		return false;
+    	}
+        String password=customer.getPassword();
+        String encrypted=encryptPassword(password);
+        customer.setPassword(encrypted);
+        int customerId=database.addCustomerDetails(customer);
+        if(customerId!=0) {
+        	 customer.setCustomerId(customerId);
+             cache.setCustomerDetails(customer);
+             return true;
+//              updateFile(customer);
+//            return createFile(userName);
+        }
+        return false;
+        
+       
+    }
+    /*private void setCustomerDetails(String userName) throws SQLException {
+    	Customer customer=database.getCustomerDetails(userName);
+    	if(customer!=null) {
+    		cache.setCustomerDetails(customer);
+    	}
+    }
+    private void setProductDetails(String category) throws SQLException {
+    	List<Product>products=database.getProductDetails(category);
+    	if(products!=null) {
+    		for(Product product:products) {
+    			cache.setProductDetails(product);
+    		}
+    	}
+    }
+    private void setInvoiceDetails(int customerId) throws SQLException {
+    	List<Invoice>invoices=database.getInvoiceDetails(customerId);
+    	if(invoices!=null) {
+    		for(Invoice invoice:invoices) {
+    			cache.setInvoiceDetails(invoice);
+    		}
+    	}
+    }*/
     public boolean setAdminPassword(String newPassword,String oldPassword){
     
         if(!adminPassword.equals(oldPassword)) {
@@ -42,7 +113,7 @@ public class ZCartDriver {
       	return true;
        
     }
-    private void setProductDetails() throws IOException {
+ /*   private void setProductDetails() throws IOException {
         FileReader file=new FileReader("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/products.txt");
         BufferedReader bufferedReader1=new BufferedReader(file);
         String str1;
@@ -80,7 +151,7 @@ public class ZCartDriver {
         }
         fileReader.close();
         bufferedReader.close();
-    }
+    }*/
     private void setHighStockProductId(){
         Collection<Map<Integer, Product>> allProducts=cache.getProductDetails().values();
         for (Map<Integer,Product>map:allProducts){
@@ -96,7 +167,7 @@ public class ZCartDriver {
             }
         }
     }
-    private Customer getPurchaseDetails(Customer customer){
+   /* private Customer getPurchaseDetails(Customer customer){
         String username=customer.getUserName();
         try {
             FileReader fileReader=new FileReader("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/"+username+".txt");
@@ -121,22 +192,9 @@ public class ZCartDriver {
             e.printStackTrace();
         }
         return customer;
-    }
+    }*/
 
-    public boolean signUp(Customer customer){
-        Map<String,Customer>customerDetails= cache.getCustomerDetails();
-        String userName=customer.getUserName();     
-        if(customerDetails.containsKey(userName)){
-            return false;
-        }
-        System.out.print(userName);
-        String password=customer.getPassword();
-        String encrypted=encryptPassword(password);
-        customer.setPassword(encrypted);
-        cache.setCustomerDetails(customer);
-         updateFile(customer);
-       return createFile(userName);
-    }
+
     private boolean createFile(String userName){
         File file=new File("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/"+userName+".txt");
         try {
@@ -168,7 +226,7 @@ public class ZCartDriver {
         }
 	
     }
-    public void updateFile(Product product){
+    public boolean updateFile(Product product){
         int productId=product.getItemId();
         String category=product.getCategory();
         String brand=product.getBrand();
@@ -180,11 +238,14 @@ public class ZCartDriver {
             FileWriter fileWriter=new FileWriter("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/products.txt",true);
             BufferedWriter bufferedWriter=new BufferedWriter(fileWriter);
             bufferedWriter.write(str);
+            bufferedWriter.newLine();
             bufferedWriter.close();
             fileWriter.close();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
+		return false;
     }
     public void deleteProductFile(){
         File file=new File("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/products.txt");
@@ -223,11 +284,24 @@ public class ZCartDriver {
             e.printStackTrace();
         }
     }
-    public void addProduct(Product product){
+    public Product getProduct(String category, String brand, String model, double price, int stock) {
+        Product product=new Product();
+        product.setStock(stock);
+        product.setBrand(brand);
+        product.setPrice(price);
+        product.setModel(model);
+        product.setCategory(category);
+        return product;
+    }
+    public boolean addProduct(Product product){
+    	String category=product.getCategory();
+    	String brand=product.getBrand();
+    	String model=product.getModel();
+    	
         product.setItemId(productId);
-        updateFile(product);
         cache.setProductDetails(product);
         productId++;
+        return updateFile(product);
     }
     public Collection<Product> getProduct(String category){
         Map<Integer,Product> products=cache.getProductDetails().get(category);
@@ -266,7 +340,7 @@ public class ZCartDriver {
             if(highStockProductId.contains(productId)){
                 discount+=product.getPrice()*0.1;
             }
-            invoice.setSavingAmount(discount);
+            invoice.setDiscountAmount(discount);
         }
         int numOfPurchases=customer.getInvoices().size();
         if(numOfPurchases==3||invoice.getTotalAmount()>=20000){

@@ -9,7 +9,7 @@ public class Invoice {
     private int invoiceNumber;
     private Map<Integer,Integer>items=new HashMap<>();
     private double totalAmount;
-    private double savingAmount;
+    private double discountAmount;
     private double balance;
 
     public int getInvoiceNumber() {
@@ -24,13 +24,13 @@ public class Invoice {
         return items;
     }
 
-    public void setItems(int itemId,int quantity) {
-        Integer num=items.get(itemId);
+    public void setItems(int productId,int quantity) {
+        Integer num=items.get(productId);
         if(num==null){
             num=0;
         }
         num+=quantity;
-        items.put(itemId,num);
+        items.put(productId,num);
 
     }
 
@@ -42,12 +42,12 @@ public class Invoice {
         this.totalAmount+= totalAmount;
     }
 
-    public double getSavingAmount() {
-        return savingAmount;
+    public double getDiscountAmount() {
+        return discountAmount;
     }
 
-    public void setSavingAmount(double savingAmount) {
-        this.savingAmount+= savingAmount;
+    public void setDiscountAmount(double savingAmount) {
+        this.discountAmount+= savingAmount;
     }
 
     public double getBalance() {
@@ -58,6 +58,6 @@ public class Invoice {
         this.balance = balance;
     }
     public String toString(){
-        return "Total Amount:"+totalAmount+"\nDiscount:"+savingAmount+"\nBalance:"+(totalAmount-savingAmount);
+        return "Total Amount:"+totalAmount+"\nDiscount:"+discountAmount+"\nBalance:"+(totalAmount-discountAmount);
     }
 }

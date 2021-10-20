@@ -9,6 +9,9 @@ public class ZCartManagement {
     private Map<String,Customer>customerDetails=new HashMap<>();
     private Map<String, Map<Integer,Product>>productDetails=new HashMap<>();
     private Map<Integer,Invoice>invoiceDetails=new HashMap<>();
+    private List<String>customers=new ArrayList();
+    private List<Integer>invoices=new ArrayList();
+    private static final int CUSTOMERMAP=100,INVOICEMAP=100;
 //    private List<String> coupons=new ArrayList<>();
 //
 //    public List<String> getCoupons() {
@@ -32,6 +35,13 @@ public class ZCartManagement {
     }
     public void setCustomerDetails(Customer customer){
         String userName=customer.getUserName();
+        if(customerDetails.size()==CUSTOMERMAP) {
+        	String temp=customers.get(0);
+        	customers.remove(0);
+        	customerDetails.remove(temp);
+        }
+        customers.remove(userName);
+        customers.add(userName);
         customerDetails.put(userName,customer);
     }
     public void setProductDetails(Product product){
@@ -47,6 +57,13 @@ public class ZCartManagement {
     }
     public void setInvoiceDetails(Invoice invoice){
         int invoiceNumber=invoice.getInvoiceNumber();
+        if(invoiceDetails.size()==INVOICEMAP) {
+        	int temp=invoices.get(0);
+        	invoices.remove(0);
+        	invoiceDetails.remove(temp);
+        }
+        invoices.remove(invoiceNumber);
+        invoices.add(invoiceNumber);
         invoiceDetails.put(invoiceNumber,invoice);
     }
 }

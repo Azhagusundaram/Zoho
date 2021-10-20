@@ -10,9 +10,16 @@ public class Customer {
     private String userName;
     private String password;
     private String mobileNumber;
+    private int customerId;
     private Map<String,Integer>coupon=new HashMap<>();
     private List<Integer>invoices=new ArrayList<>();
 
+    public void setCustomerId(int customerId) {
+    	this.customerId=customerId;
+    }
+    public int getCustomerId() {
+    	return customerId;
+    }
     public void setCoupon(Map<String, Integer> coupon) {
         this.coupon = coupon;
     }
