@@ -1,5 +1,6 @@
 package ZCart;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 //surye.prakash@zohocorp.com
 public class InputLayer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Scanner scan=new Scanner(System.in);
         ZCartDriver driver=ZCartDriver.getInstance();
         driver.initialSetUp();
@@ -114,9 +115,9 @@ public class InputLayer {
 
     private static void addProduct(Scanner scan, ZCartDriver driver) {
         System.out.println("Category");
-        String category= scan.nextLine();
+        int category= scan.nextInt();
         System.out.println("Brand");
-        String brand= scan.nextLine();
+        int brand= scan.nextInt();
         System.out.println("Model");
         String model= scan.nextLine();
         System.out.println("price");
@@ -124,19 +125,11 @@ public class InputLayer {
         System.out.println("Stock");
         int stock= scan.nextInt();
         scan.nextLine();
-        Product product = getProduct(category, brand, model, price, stock);
+        Product product = Helper.getProduct(category, brand, model, price, stock);
         driver.addProduct(product);
     }
 
-    private static Product getProduct(String category, String brand, String model, double price, int stock) {
-        Product product=new Product();
-        product.setStock(stock);
-        product.setBrand(brand);
-        product.setPrice(price);
-        product.setModel(model);
-        product.setCategory(category);
-        return product;
-    }
+
 
     private static void shopProducts(Scanner scan, ZCartDriver driver, String userName) {
         System.out.println("1.Mobile\n2.Laptop\n3.Tablet");
@@ -208,7 +201,7 @@ public class InputLayer {
         }
     }
 
-    private static void addAccount(Scanner scan, ZCartDriver driver) {
+    private static void addAccount(Scanner scan, ZCartDriver driver) throws SQLException {
         System.out.println("Name");
         String name= scan.nextLine();
         System.out.println("User Name/emailId");

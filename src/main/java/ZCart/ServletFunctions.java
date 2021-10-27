@@ -20,7 +20,16 @@ public class ServletFunctions extends HttpServlet {
 		
 		 PrintWriter writter=response.getWriter();
 		String path=request.getParameter("path");
-		if(path.equals("initialSetUp")) {
+		if(path.equals("checksession")) {
+			HttpSession session=request.getSession();
+			Object sessionName=session.getAttribute("userName");
+			System.out.println(sessionName);
+			if(sessionName==null) {
+				writter.print(false);
+			}else {
+				writter.print(true);
+			}
+		}else if(path.equals("initialSetUp")) {
 			driver.initialSetUp();
 		}else if(path.equals("addAccount")) {
 			 boolean output = false;
@@ -32,6 +41,11 @@ public class ServletFunctions extends HttpServlet {
 			}
 			 
 			 writter.print(output);
+		}else if(path.equals("removeAttribute")) {
+			HttpSession session=request.getSession();
+			Object sessionName=session.getAttribute("userName");
+			sessionName=null;
+			System.out.println(sessionName);
 		}
 		
 	 

@@ -12,21 +12,20 @@ public class ZCartDriver {
 	private ZCartDriver() {
     	
     }
-    private int productId=1;
-    private int invoiceNumber=1;
+//    private int productId=1;
+//    private int invoiceNumber=1;
     private List<Integer> highStockProductId=new ArrayList<>();
     private int highStocks=0;
     private static final String adminUser="admin@zoho.com";
     private   static  String adminPassword="xyzzy";
     ZCartManagement cache=new ZCartManagement();
-    PersistenceLayer database=null;
+    PersistenceLayer database=new SqlDatabase();
     
     public void initSet() {
         try (FileReader fileReader = new FileReader("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/interfaces.properties")){
             Properties prop=new Properties();
             prop.load(fileReader);
             String className=prop.getProperty("mysql");
-            System.out.println(className);
             Class c = Class.forName(className);
             Constructor cons = c.getConstructor();
             database = (PersistenceLayer)cons.newInstance();
@@ -43,6 +42,8 @@ public class ZCartDriver {
     public void initialSetUp(){
 //        try {
         	initSet();
+        	setCategoryDetails();
+        	setBrandDetails();
 //        	setCustomerDetails();
 //        	setProductDetails();
 //            setProductDetails();
@@ -51,6 +52,14 @@ public class ZCartDriver {
 //            e.printStackTrace();
 //        }
       
+    }
+    public void setCategoryDetails() {
+    	Map<Integer, Category>categories=database.getCategoryDetails();
+    	cache.setCategoryDetails(categories);
+    }
+    public void setBrandDetails() {
+    	Map<Integer, Brand>brands=database.getBrandDetails();
+    	cache.setBrandDetails(brands);
     }
     public boolean signUp(Customer customer) throws SQLException{
     	String userName=customer.getUserName();  
@@ -75,9 +84,174 @@ public class ZCartDriver {
 //              updateFile(customer);
 //            return createFile(userName);
         }
+        return false; 
+    }
+    private String encryptPassword(String password){
+        char[]chars=password.toCharArray();
+        StringBuilder encryptedPassword=new StringBuilder();
+        char k;
+        for(char c:chars){
+            if(c=='Z'){
+                k='A';
+            }else if(c=='z'){
+                k='a';
+            }
+            else if(c=='9'){
+                k='0';
+            }else {
+                k= (char) (c+1);
+            }
+            encryptedPassword.append(k);
+        }
+        return encryptedPassword.toString();
+    }
+    private String decryptPassword(String password){
+        char[]chars=password.toCharArray();
+        StringBuilder decrypted =new StringBuilder();
+        char k;
+        for(char c:chars){
+            if(c=='A'){
+                k='Z';
+            }else if(c=='a'){
+                k='z';
+            }
+            else if(c=='0'){
+                k='9';
+            }else {
+                k= (char) (c-1);
+            }
+            decrypted.append(k);
+        }
+        return decrypted.toString();
+    }
+    public boolean setAdminPassword(String newPassword,String oldPassword){
+        if(!adminPassword.equals(oldPassword)) {
+         	return false;
+         }
+        if(oldPassword.equals(newPassword)) {
+         	return false;
+         }
+        adminPassword=newPassword;	
+      	return true;
+    }
+    public boolean userLogin(String userName,String password) {
+        Customer customer= cache.getCustomerDetails().get(userName);
+        if(customer==null){
+        	customer=database.getCustomerDetails(userName);
+			
+        }
+        if(customer==null) {
+        	return false;
+        }
+        cache.setCustomerDetails(customer);
+        String encrypted=customer.getPassword();
+        String decrypted=decryptPassword(encrypted);
+        if(decrypted.equals(password)){
+            return true;
+        }
         return false;
-        
-       
+    }
+    public  boolean adminLogin(String userName,String password){
+        return userName.equals(adminUser)&&password.equals(adminPassword);
+    }
+    public boolean checkPassword(String password){
+        if (Pattern.matches("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,20}",password)){
+            return true;
+        }
+        return false;
+    }
+ 
+    public boolean changePassword(String userName,String newPassword,String oldPassword) {
+   	 Customer customer= cache.getCustomerDetails().get(userName);
+   	 if(customer==null) {
+		customer=database.getCustomerDetails(userName);
+   	 }
+   	 if(customer!=null) {
+   		 cache.setCustomerDetails(customer);
+   		 String encrypted=customer.getPassword();
+      	 String decrypted=decryptPassword(encrypted);
+      	 System.out.println("decry"+decrypted);
+      	 System.out.println("old"+oldPassword);
+      	 if(!decrypted.equals(oldPassword)) {
+      		 return false;
+      	 }
+      	 System.out.println("old1");
+      	 if(oldPassword.equals(newPassword)) {
+      		 return false;
+      	 }
+      	 System.out.println("old2");
+      	 String newEncrypted=encryptPassword(newPassword);
+      	 customer.setPassword(newEncrypted);
+		 return database.changePassword(userName, newPassword);
+		
+//      	 deleteCustomerFile();
+//      	 updateCustomerFile();
+   	 }
+   	 return false; 
+   }
+    public List<Invoice> getInvoices(String userName){
+        Customer customer=cache.getCustomerDetails().get(userName);
+        if(customer==null) {
+			customer=database.getCustomerDetails(userName);
+        }
+        cache.setCustomerDetails(customer);
+        if(customer!=null) {
+            List<Invoice>invoices=new ArrayList<Invoice>( customer.getInvoices().values());
+            return invoices;
+        }
+        return null;
+    }
+    public int addProduct(Product product){
+			int productId=database.addProductDetails(product);
+			System.out.println(productId);
+			if(productId>0) {
+				product.setProductId(productId);
+			}
+//			cache.setProductDetails(product);
+			return productId;
+    }
+    public int editProduct(Product product){
+    	return database.editProductDetails(product);
+}
+    public int addCategory(Category category){
+    	String categoryName=category.getCategoryName();
+    	int categoryId=database.addCategory(categoryName);
+		if(categoryId>0) {
+			category.setCategoryId(categoryId);
+		}
+		cache.setCategoryDetails(category);
+		return categoryId;	 
+    }
+    public int addBrand(Brand brand){
+    	String brandName=brand.getBrandName();
+    	int brandId=database.addBrand(brandName);
+		if(brandId>0) {
+			brand.setBrandId(brandId);
+		}
+		cache.setBrandDetails(brand);
+		return brandId;
+    }
+    public Map<Integer, Category> getAllCategories() {
+    	return cache.getCategoryDetails();
+    }
+    public Map<Integer, Brand> getAllBrands() {
+    	return cache.getBrandDetails();
+    }
+    public Map<Integer, Product> getAllProducts(String search) {
+    	Map<Integer, Product>products=database.getproducts(search);
+    	return products;
+    }
+    public Map<Integer, Product> getAllProducts(int stock) {
+    	Map<Integer, Product>products=database.getproducts(stock);
+    	return products;
+    }
+    public boolean deleteProduct(int productId) {
+    	boolean output=database.deleteProduct(productId);
+    	return output;
+    }
+    public boolean reOrderProduct(int productId,int stock) {
+    	boolean output=database.reOrderProduct(productId,stock);
+    	return output;
     }
     /*private void setCustomerDetails(String userName) throws SQLException {
     	Customer customer=database.getCustomerDetails(userName);
@@ -101,18 +275,7 @@ public class ZCartDriver {
     		}
     	}
     }*/
-    public boolean setAdminPassword(String newPassword,String oldPassword){
     
-        if(!adminPassword.equals(oldPassword)) {
-         	return false;
-         }
-        if(oldPassword.equals(newPassword)) {
-         	return false;
-         }
-        adminPassword=newPassword;	
-      	return true;
-       
-    }
  /*   private void setProductDetails() throws IOException {
         FileReader file=new FileReader("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/products.txt");
         BufferedReader bufferedReader1=new BufferedReader(file);
@@ -162,7 +325,7 @@ public class ZCartDriver {
                     highStockProductId.clear();
                 }
                 if(product.getStock()==highStocks){
-                    highStockProductId.add(product.getItemId());
+                    highStockProductId.add(product.getProductId());
                 }
             }
         }
@@ -194,7 +357,7 @@ public class ZCartDriver {
         return customer;
     }*/
 
-
+/*
     private boolean createFile(String userName){
         File file=new File("/home/inc4/eclipse-webworkspace/ZCart/src/main/webapp/TextFiles/"+userName+".txt");
         try {
@@ -225,9 +388,9 @@ public class ZCartDriver {
             e.printStackTrace();
         }
 	
-    }
-    public boolean updateFile(Product product){
-        int productId=product.getItemId();
+    }*/
+  /*  public boolean updateFile(Product product){
+        int productId=product.getProductId();
         String category=product.getCategory();
         String brand=product.getBrand();
         String model=product.getModel();
@@ -283,26 +446,8 @@ public class ZCartDriver {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-    public Product getProduct(String category, String brand, String model, double price, int stock) {
-        Product product=new Product();
-        product.setStock(stock);
-        product.setBrand(brand);
-        product.setPrice(price);
-        product.setModel(model);
-        product.setCategory(category);
-        return product;
-    }
-    public boolean addProduct(Product product){
-    	String category=product.getCategory();
-    	String brand=product.getBrand();
-    	String model=product.getModel();
-    	
-        product.setItemId(productId);
-        cache.setProductDetails(product);
-        productId++;
-        return updateFile(product);
-    }
+    }*/
+
     public Collection<Product> getProduct(String category){
         Map<Integer,Product> products=cache.getProductDetails().get(category);
         if(products==null){
@@ -325,9 +470,9 @@ public class ZCartDriver {
     public Invoice checkOut(List<Product>products, String userName, String couponCode){
         Customer customer=cache.getCustomerDetails().get(userName);
         Invoice invoice=new Invoice();
-        invoice.setInvoiceNumber(invoiceNumber);
+//        invoice.setInvoiceNumber(invoiceNumber);
         for(Product product:products){
-            int productId=product.getItemId();
+            int productId=product.getProductId();
             double amount=product.getPrice();
             int stock=product.getStock();
             if(stock==0){
@@ -348,13 +493,13 @@ public class ZCartDriver {
             customer.setCoupon(code);
         }
 
-        deleteProductFile();
-        updateProductFile();
+//        deleteProductFile();
+//        updateProductFile();
         setHighStockProductId();
-        customer.setInvoices(invoiceNumber);
-        cache.setInvoiceDetails(invoice);
-        updateFile(invoice,userName);
-        invoiceNumber++;
+        customer.setInvoices(invoice);
+//        cache.setInvoiceDetails(invoice);
+//        updateFile(invoice,userName);
+//        invoiceNumber++;
         return invoice;
     }
     public List<Product> getLessStocks(){
@@ -370,26 +515,13 @@ public class ZCartDriver {
         }
         return lessStocks;
     }
-    public List<Invoice> getInvoices(String userName){
-        Customer customer=cache.getCustomerDetails().get(userName);
-        if(customer!=null) {
-        	List<Integer>invoiceNumbers=customer.getInvoices();
-            List<Invoice>invoices=new ArrayList<>();
-            for (int invoiceNumber:invoiceNumbers){
-                Invoice invoice=cache.getInvoiceDetails().get(invoiceNumber);
-                invoices.add(invoice);
-            }
-            return invoices;
-        }
-        return null;
-        
-    }
+    
     public void reOrder(List<Product>products){
         for (Product product:products){
             product.setStock(10);
         }
-        deleteProductFile();
-        updateProductFile();
+//        deleteProductFile();
+//        updateProductFile();
     }
     public String createCouponCode(Customer customer){
         String alphaNumeric="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -415,104 +547,7 @@ public class ZCartDriver {
         }
         return 0;
     }
-    public boolean checkPassword(String password){
-        if (Pattern.matches("(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,20}",password)){
-            return true;
-        }
-        return false;
-    }
-    private String encryptPassword(String password){
-        char[]chars=password.toCharArray();
-        StringBuilder encryptedPassword=new StringBuilder();
-        char k;
-        for(char c:chars){
-            if(c=='Z'){
-                k='A';
-            }else if(c=='z'){
-                k='a';
-            }
-            else if(c=='9'){
-                k='0';
-            }else {
-                k= (char) (c+1);
-            }
-            encryptedPassword.append(k);
-        }
-        return encryptedPassword.toString();
-    }
-    private String decryptPassword(String password){
-        char[]chars=password.toCharArray();
-        StringBuilder decrypted =new StringBuilder();
-        char k;
-        for(char c:chars){
-            if(c=='A'){
-                k='Z';
-            }else if(c=='a'){
-                k='z';
-            }
-            else if(c=='0'){
-                k='9';
-            }else {
-                k= (char) (c-1);
-            }
-            decrypted.append(k);
-        }
-        return decrypted.toString();
-    }
-    public boolean changePassword(String userName,String newPassword,String oldPassword) {
-   	 Customer customer= cache.getCustomerDetails().get(userName);
-   	 if(customer!=null) {
-   		String encrypted=customer.getPassword();
-      	 String decrypted=decryptPassword(encrypted);
-      	 System.out.println("decry"+decrypted);
-      	 System.out.println("old"+oldPassword);
-      	 if(!decrypted.equals(oldPassword)) {
-      		 return false;
-      	 }
-      	System.out.println("old1");
-      	 if(oldPassword.equals(newPassword)) {
-      		 return false;
-      	 }
-      	System.out.println("old2");
-      	 String newEncrypted=encryptPassword(newPassword);
-      	 customer.setPassword(newEncrypted);
-      	 deleteCustomerFile();
-      	 updateCustomerFile();
-      	 return true;
-   	 }
-   	 return false;
-   	 
-   }
-    public boolean userLogin(String userName,String password){
-    	System.out.println(cache.getCustomerDetails().toString());
-        Customer customer= cache.getCustomerDetails().get(userName);
-        System.out.println(customer);
-        if(customer==null){
-            return false;
-        }
-        String encrypted=customer.getPassword();
-        String decrypted=decryptPassword(encrypted);
-       
-        if(decrypted.equals(password)){
-        	
-            return true;
-        }
-        return false;
-    }
-    public  boolean adminLogin(String userName,String password){
-        return userName.equals(adminUser)&&password.equals(adminPassword);
-    }
-
-    public Product getProduct(int itemId, String category, String brand, String model, double price, int stock) {
-        Product item=new Product();
-        item.setItemId(itemId);
-        item.setCategory(category);
-        item.setBrand(brand);
-        item.setModel(model);
-        item.setStock(stock);
-        item.setPrice(price);
-        return item;
-    }
+    
 
     public Customer getCustomer(String name, String userName, String password, String mobile) {
         Customer customer=new Customer();

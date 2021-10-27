@@ -1,35 +1,35 @@
 package ZCart;
 
 public class Product {
-    private int itemId;
-    private String category;
-    private String brand;
+    private int productId;
+    private int categoryId;
+    private int brandId;
     private String model;
     private double price;
     private int stock=0;
 
-    public int getItemId() {
-        return itemId;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
-    public String getCategory() {
-        return category;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(int category) {
+        this.categoryId = category;
     }
 
-    public String getBrand() {
-        return brand;
+    public int getBrandId() {
+        return brandId;
     }
 
-    public void setBrand(String brand) {
-        this.brand = brand;
+    public void setBrandId(int brand) {
+        this.brandId = brand;
     }
 
     public String getModel() {
@@ -57,7 +57,7 @@ public class Product {
     }
 
     public String toString(){
-        return itemId+"\t"+brand+"\t"+model+"\t"+price;
+        return productId+"\t"+brandId+"\t"+model+"\t"+price;
     }
 
 }

@@ -12,7 +12,7 @@ public class Customer {
     private String mobileNumber;
     private int customerId;
     private Map<String,Integer>coupon=new HashMap<>();
-    private List<Integer>invoices=new ArrayList<>();
+    private Map<Integer,Invoice>invoices=new HashMap<>();
 
     public void setCustomerId(int customerId) {
     	this.customerId=customerId;
@@ -26,19 +26,16 @@ public class Customer {
     public void setCoupon(String code){
         coupon.put(code,3);
     }
-
-    public void setInvoices(List<Integer> invoices) {
-        this.invoices = invoices;
-    }
-    public void setInvoices(int invoice){
-        invoices.add(invoice);
+    public void setInvoices(Invoice invoice){
+    	int invoiceNumber=invoice.getInvoiceNumber();
+        invoices.put(invoiceNumber,invoice);
     }
 
     public Map<String, Integer> getCoupon() {
         return coupon;
     }
 
-    public List<Integer> getInvoices() {
+    public Map<Integer, Invoice> getInvoices() {
         return invoices;
     }
 
